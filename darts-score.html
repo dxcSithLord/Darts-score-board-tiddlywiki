@@ -10,16 +10,32 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     background: #f4f4f4;
     margin: 0;
-    padding: 20px;
+    padding: 10px;
     color: #333;
+    box-sizing: border-box;
+}
+
+* {
+    box-sizing: border-box;
 }
 
 .tiddlywiki-header {
     background: #5778d8;
     color: white;
-    padding: 15px 20px;
-    margin: -20px -20px 20px -20px;
+    padding: 10px 15px;
+    margin: -10px -10px 20px -10px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tiddlywiki-header h1 {
+    margin: 0 0 5px 0;
+    font-size: 1.5rem;
+}
+
+.tiddlywiki-header p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
 }
 
 .tiddler {
@@ -46,12 +62,39 @@ body {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
+    overflow-x: auto;
+    display: block;
+    white-space: nowrap;
+}
+
+.scoreboard thead, .scoreboard tbody {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
 }
 
 .scoreboard th, .scoreboard td {
     border: 1px solid #ddd;
-    padding: 10px;
+    padding: 8px 4px;
     text-align: center;
+    font-size: 14px;
+    word-wrap: break-word;
+}
+
+.scoreboard th:first-child, .scoreboard td:first-child {
+    width: 25%;
+    text-align: left;
+}
+
+.scoreboard th:nth-child(2), .scoreboard td:nth-child(2),
+.scoreboard th:nth-child(3), .scoreboard td:nth-child(3),
+.scoreboard th:nth-child(4), .scoreboard td:nth-child(4),
+.scoreboard th:nth-child(5), .scoreboard td:nth-child(5) {
+    width: 15%;
+}
+
+.scoreboard th:last-child, .scoreboard td:last-child {
+    width: 15%;
 }
 
 .scoreboard th {
@@ -70,6 +113,7 @@ body {
 
 .player-controls {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     align-items: center;
     margin-bottom: 10px;
@@ -78,10 +122,13 @@ body {
     border-radius: 4px;
 }
 
-.player-controls input {
-    padding: 5px 10px;
+.player-controls input, .player-controls select {
+    padding: 8px 10px;
     border: 1px solid #ccc;
     border-radius: 3px;
+    flex: 1;
+    min-width: 120px;
+    font-size: 14px;
 }
 
 .btn {
@@ -113,6 +160,7 @@ body {
 
 .score-input {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     align-items: center;
     margin-bottom: 15px;
@@ -121,8 +169,18 @@ body {
     border-radius: 4px;
 }
 
+.score-input input {
+    flex: 1;
+    min-width: 100px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 16px;
+}
+
 .game-controls {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 20px;
 }
@@ -148,6 +206,169 @@ body {
     padding: 10px;
     background: #f9f9f9;
     border-radius: 4px;
+    font-size: 13px;
+}
+
+/* Mobile and Tablet Responsive Styles */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 5px;
+        font-size: 14px;
+    }
+    
+    .tiddlywiki-header {
+        margin: -5px -5px 15px -5px;
+        padding: 8px 10px;
+    }
+    
+    .tiddlywiki-header h1 {
+        font-size: 1.3rem;
+    }
+    
+    .tiddlywiki-header p {
+        font-size: 0.8rem;
+    }
+    
+    .tiddler {
+        margin-bottom: 15px;
+    }
+    
+    .tiddler-title {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+    
+    .tiddler-content {
+        padding: 10px;
+    }
+    
+    .player-controls {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 8px;
+    }
+    
+    .player-controls input, .player-controls select {
+        margin-bottom: 5px;
+        min-width: auto;
+    }
+    
+    .score-input {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 8px;
+    }
+    
+    .score-input label {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .scoreboard {
+        font-size: 12px;
+        display: table;
+        white-space: normal;
+    }
+    
+    .scoreboard th, .scoreboard td {
+        padding: 6px 3px;
+        font-size: 11px;
+    }
+    
+    .scoreboard thead, .scoreboard tbody {
+        display: table-header-group;
+    }
+    
+    .scoreboard tbody {
+        display: table-row-group;
+    }
+    
+    .btn {
+        padding: 10px 15px;
+        font-size: 14px;
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    .btn-small {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .current-game {
+        padding: 8px;
+        font-size: 13px;
+    }
+    
+    .match-history {
+        max-height: 150px;
+        font-size: 12px;
+        padding: 8px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .scoreboard th, .scoreboard td {
+        padding: 4px 2px;
+        font-size: 10px;
+    }
+    
+    .scoreboard th:first-child, .scoreboard td:first-child {
+        width: 30%;
+    }
+    
+    .scoreboard th:nth-child(2), .scoreboard td:nth-child(2),
+    .scoreboard th:nth-child(3), .scoreboard td:nth-child(3) {
+        width: 20%;
+    }
+    
+    .scoreboard th:nth-child(4), .scoreboard td:nth-child(4),
+    .scoreboard th:nth-child(5), .scoreboard td:nth-child(5) {
+        width: 15%;
+    }
+    
+    .scoreboard th:last-child, .scoreboard td:last-child {
+        width: 15%;
+    }
+    
+    .btn-small {
+        font-size: 10px;
+        padding: 6px 8px;
+    }
+}
+
+/* Landscape orientation adjustments */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .tiddlywiki-header h1 {
+        font-size: 1.2rem;
+    }
+    
+    .tiddlywiki-header p {
+        display: none;
+    }
+    
+    .tiddler {
+        margin-bottom: 10px;
+    }
+    
+    .match-history {
+        max-height: 120px;
+    }
+    
+    .player-controls {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .score-input {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        width: auto;
+        margin-bottom: 0;
+    }
 }
 </style>
 </head>
@@ -167,6 +388,7 @@ body {
             <select id="gameType">
                 <option value="501">501 Game</option>
                 <option value="301">301 Game</option>
+                <option value="180">180 Game</option>
                 <option value="cricket">Cricket</option>
             </select>
             <button class="btn" onclick="startNewGame()">Start New Game</button>
@@ -272,11 +494,25 @@ function startNewGame() {
     }
     
     const gameType = document.getElementById('gameType').value;
-    const startScore = gameType === '301' ? 301 : 501;
+    let startScore;
+    
+    switch(gameType) {
+        case '301':
+            startScore = 301;
+            break;
+        case '180':
+            startScore = 180;
+            break;
+        case 'cricket':
+            startScore = 0;
+            break;
+        default:
+            startScore = 501;
+    }
     
     // Reset all players for new game
     players.forEach(player => {
-        player.currentScore = gameType === 'cricket' ? 0 : startScore;
+        player.currentScore = startScore;
         player.active = true;
     });
     
@@ -330,8 +566,8 @@ function recordScore() {
     } else {
         currentPlayer.currentScore -= score;
         
-        // Check for bust (score below 0 or exactly 1)
-        if (currentPlayer.currentScore < 0 || currentPlayer.currentScore === 1) {
+        // Check for bust (score below 0 or exactly 1 for standard games)
+        if (currentPlayer.currentScore < 0 || (currentPlayer.currentScore === 1 && currentGame.type !== '180')) {
             currentPlayer.currentScore += score; // Reset score
             addToHistory(`${currentPlayer.name} bust! Score reset.`);
         }
