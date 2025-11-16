@@ -467,6 +467,14 @@ let currentPlayerIndex = 0;
 let gameHistory = [];
 let scoreHistory = [];
 
+
+// HTML escape helper to prevent XSS attacks
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // Player constructor
 function Player(name) {
     this.name = name;
@@ -496,7 +504,7 @@ function addPlayer() {
     players.push(new Player(name));
     nameInput.value = '';
     updateScoreboard();
-    addToHistory(`Player ${name} joined the tournament`);
+    addToHistory(`Player ${escapeHtml(name)} joined the tournament`);
 }
 
 // Start new game
@@ -580,24 +588,12 @@ function recordScore() {
         currentPlayer.currentScore -= score;
 
         // Check for bust (score below 0 or exactly 1 for standard games)
-        // In 501/301, you must finish on exactly 0 with a double. Score of 1 is bust as you cannot double out.
-        // In 180, no double-out requirement so score of 1 is allowed.
         if (currentPlayer.currentScore < 0 || (currentPlayer.currentScore === 1 && currentGame.type !== '180')) {
-            currentPlayer.currentScore += score; // Reset score to before this throw
-            addToHistory(`${currentPlayer.name} bust! Score reset to ${currentPlayer.currentScore}.`);
-
-            // Bust is a terminal event - advance turn and exit immediately
-            do {
-                currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-            } while (!players[currentPlayerIndex].active);
-
-            updateCurrentPlayer();
-            updateScoreboard();
-            scoreInput.value = '';
-            return;
+            currentPlayer.currentScore += score; // Reset score
+            addToHistory(`${escapeHtml(currentPlayer.name)} bust! Score reset.`);
         }
 
-        // Check for win (only reached if no bust)
+        // Check for win
         if (currentPlayer.currentScore === 0) {
             currentPlayer.gamesWon++;
             currentPlayer.active = false;
@@ -607,7 +603,7 @@ function recordScore() {
                 currentPlayer.bestFinish = score;
             }
 
-            addToHistory(`🎉 ${currentPlayer.name} wins the game with a ${score} finish!`);
+            addToHistory(`🎉 ${escapeHtml(currentPlayer.name)} wins the game with a ${score} finish!`);
             document.getElementById('currentGameTiddler').style.display = 'none';
             updateScoreboard();
             scoreInput.value = '';
@@ -615,7 +611,7 @@ function recordScore() {
         }
     }
 
-    // Move to next player (normal scoring, no bust or win)
+    // Move to next player
     do {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
     } while (!players[currentPlayerIndex].active);
@@ -624,7 +620,7 @@ function recordScore() {
     updateScoreboard();
     scoreInput.value = '';
 
-    addToHistory(`${currentPlayer.name} threw ${score}, score now ${currentPlayer.currentScore}`);
+    addToHistory(`${escapeHtml(currentPlayer.name)} threw ${score}, score now ${currentPlayer.currentScore}`);
 }
 
 // Undo last score
@@ -649,7 +645,7 @@ function undoLastScore() {
     updateScoreboard();
     document.getElementById('currentGameTiddler').style.display = 'block';
 
-    addToHistory(`Undid ${player.name}'s throw of ${lastScore.thrownScore}`);
+    addToHistory(`Undid ${escapeHtml(player.name)}'s throw of ${lastScore.thrownScore}`);
 }
 
 // Update current player display
@@ -702,7 +698,7 @@ function removePlayer(index) {
 
     updateScoreboard();
     updateCurrentPlayer();
-    addToHistory(`Player ${player.name} removed from tournament`);
+    addToHistory(`Player ${escapeHtml(player.name)} removed from tournament`);
 }
 
 // Update scoreboard
