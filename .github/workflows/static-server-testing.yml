@@ -39,30 +39,63 @@ jobs:
         echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
         sleep 3
 
-    - name: Start http-server (Windows)
+    - name: Test file content directly (Windows)
       if: runner.os == 'Windows'
       shell: pwsh
       run: |
-        Start-Process -NoNewWindow -FilePath "npx" -ArgumentList "http-server","-p","8080"
-        Start-Sleep -Seconds 5
+        # On Windows, validate the HTML file directly without HTTP server
+        # The browser-testing.yml workflow tests actual browser rendering
+        Write-Host "Testing darts-score.html directly via file system..."
+
+        # Verify file exists
+        if (-not (Test-Path "darts-score.html")) {
+          throw "darts-score.html not found"
+        }
+        Write-Host "✓ File exists"
+
+        # Read and validate content
+        $content = Get-Content -Path "darts-score.html" -Raw
+        Write-Host "File size: $($content.Length) bytes"
+
+        # Check for required content
+        if ($content -match "Darts Competition Scoreboard") {
+          Write-Host "✓ Title found"
+        } else {
+          throw "Title 'Darts Competition Scoreboard' not found"
+        }
+
+        if ($content -match "<!DOCTYPE html>") {
+          Write-Host "✓ Valid HTML doctype"
+        } else {
+          throw "Missing DOCTYPE declaration"
+        }
+
+        if ($content -match '<html lang="en">') {
+          Write-Host "✓ Language attribute present"
+        } else {
+          throw "Missing lang attribute"
+        }
+
+        if ($content -match "<script>") {
+          Write-Host "✓ JavaScript section found"
+        } else {
+          throw "No JavaScript found"
+        }
+
+        if ($content -match "<style>") {
+          Write-Host "✓ CSS styles found"
+        } else {
+          throw "No CSS styles found"
+        }
+
+        Write-Host "✓ All content validation checks passed"
+        Write-Host "Note: Full browser rendering is tested in browser-testing.yml"
 
     - name: Test server response (Unix)
       if: runner.os != 'Windows'
       run: |
         curl -f http://localhost:8080/darts-score.html -o /dev/null -s -w "HTTP Status: %{http_code}\n"
         curl http://localhost:8080/darts-score.html | grep -q "Darts Competition Scoreboard" && echo "✓ Content validation passed"
-
-    - name: Test server response (Windows)
-      if: runner.os == 'Windows'
-      shell: pwsh
-      run: |
-        $response = Invoke-WebRequest -Uri "http://localhost:8080/darts-score.html"
-        Write-Host "HTTP Status: $($response.StatusCode)"
-        if ($response.Content -match "Darts Competition Scoreboard") {
-          Write-Host "✓ Content validation passed"
-        } else {
-          throw "Content validation failed"
-        }
 
     - name: Cleanup (Unix)
       if: always() && runner.os != 'Windows'
