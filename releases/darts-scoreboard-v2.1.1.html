@@ -467,6 +467,7 @@ let currentPlayerIndex = 0;
 let gameHistory = [];
 let scoreHistory = [];
 
+
 // HTML escape helper to prevent XSS attacks
 function escapeHtml(text) {
     const div = document.createElement('div');
@@ -657,10 +658,42 @@ function updateCurrentPlayer() {
 // Remove player
 function removePlayer(index) {
     const player = players[index];
+
+    // Guard: Prevent removing the currently active player during an ongoing game
+    if (currentGame && currentGame.inProgress && index === currentPlayerIndex) {
+        alert(`Cannot remove ${player.name} - they are the current active player. Please finish the game or pause first.`);
+        return;
+    }
+
     players.splice(index, 1);
 
-    if (currentPlayerIndex >= players.length) {
+    // Adjust currentPlayerIndex after removal
+    if (players.length === 0) {
         currentPlayerIndex = 0;
+    } else if (index < currentPlayerIndex) {
+        // Removed player was before current, shift index down
+        currentPlayerIndex--;
+    } else if (currentPlayerIndex >= players.length) {
+        // Current index is now out of bounds
+        currentPlayerIndex = Math.max(0, players.length - 1);
+    }
+
+    // Ensure currentPlayerIndex points to an active player if game is in progress
+    if (currentGame && currentGame.inProgress && players.length > 0) {
+        // Check if at least one active player remains
+        const hasActivePlayer = players.some(p => p.active);
+        if (!hasActivePlayer) {
+            // No active players remain, end the game
+            currentGame.inProgress = false;
+            addToHistory('Game ended - no active players remaining');
+            document.getElementById('currentGameTiddler').style.display = 'none';
+        } else if (!players[currentPlayerIndex].active) {
+            // Current player is inactive, find next active player
+            const startIndex = currentPlayerIndex;
+            do {
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            } while (!players[currentPlayerIndex].active && currentPlayerIndex !== startIndex);
+        }
     }
 
     updateScoreboard();
@@ -688,16 +721,31 @@ function updateScoreboard() {
 
         const average = player.totalThrows > 0 ? (player.totalScore / player.totalThrows).toFixed(1) : '0.0';
 
-        row.innerHTML = `
-            <td><strong>${escapeHtml(player.name)}</strong></td>
-            <td>${player.currentScore}</td>
-            <td>${player.gamesWon}</td>
-            <td>${average}</td>
-            <td>${player.bestFinish || '-'}</td>
-            <td>
-                <button type="button" class="btn btn-small btn-danger" onclick="removePlayer(${index})">Remove</button>
-            </td>
-        `;
+        // Create cells safely using textContent to prevent XSS
+        const nameCell = row.insertCell();
+        const nameStrong = document.createElement('strong');
+        nameStrong.textContent = player.name;
+        nameCell.appendChild(nameStrong);
+
+        const scoreCell = row.insertCell();
+        scoreCell.textContent = player.currentScore;
+
+        const winsCell = row.insertCell();
+        winsCell.textContent = player.gamesWon;
+
+        const avgCell = row.insertCell();
+        avgCell.textContent = average;
+
+        const bestCell = row.insertCell();
+        bestCell.textContent = player.bestFinish || '-';
+
+        const actionCell = row.insertCell();
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn btn-small btn-danger';
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', () => removePlayer(index));
+        actionCell.appendChild(removeBtn);
     });
 }
 
@@ -712,7 +760,15 @@ function addToHistory(message) {
     }
 
     const historyDiv = document.getElementById('matchHistory');
-    historyDiv.innerHTML = gameHistory.map(entry => `<p>${entry}</p>`).join('');
+    // Clear existing content safely
+    historyDiv.innerHTML = '';
+
+    // Create elements safely using textContent to prevent XSS
+    gameHistory.forEach(entry => {
+        const p = document.createElement('p');
+        p.textContent = entry;
+        historyDiv.appendChild(p);
+    });
 }
 
 // Reset tournament
