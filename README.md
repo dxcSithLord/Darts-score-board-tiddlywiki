@@ -1,3 +1,5 @@
+[![Browser Testing (Cross-Platform)](https://github.com/dxcSithLord/Darts-score-board-tiddlywiki/actions/workflows/browser-testing.yml/badge.svg)](https://github.com/dxcSithLord/Darts-score-board-tiddlywiki/actions/workflows/browser-testing.yml)
+
 With help from Claude.ai:
 
 I'll create a darts competition scoreboard using TiddlyWiki's HTML format. 
