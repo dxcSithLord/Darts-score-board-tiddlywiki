@@ -35,6 +35,7 @@ jobs:
       timeout-minutes: 3
 
     - name: Validate HTML files
+      shell: bash
       run: |
         # Validate all HTML files except TiddlyWiki-generated docs.html
         # docs.html uses TiddlyWiki's own HTML structure which differs from standard validation
@@ -52,6 +53,7 @@ jobs:
       timeout-minutes: 3
 
     - name: Run htmlhint
+      shell: bash
       run: |
         # Validate all HTML files except TiddlyWiki-generated docs.html
         for file in *.html; do
