@@ -67,7 +67,7 @@ jobs:
     - name: Validate HTML in ${{ matrix.container }}
       run: |
         podman run --rm -v $(pwd):/workspace:Z ${{ matrix.container }} bash -c "
-          dnf install -y nodejs npm &&
+          apt install -y nodejs npm &&
           npm install -g html-validate htmlhint &&
           cd /workspace &&
           html-validate '*.html' &&
