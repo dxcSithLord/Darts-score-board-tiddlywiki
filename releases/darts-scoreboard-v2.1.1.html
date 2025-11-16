@@ -467,6 +467,13 @@ let currentPlayerIndex = 0;
 let gameHistory = [];
 let scoreHistory = [];
 
+// HTML escape helper to prevent XSS attacks
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // Player constructor
 function Player(name) {
     this.name = name;
@@ -496,7 +503,7 @@ function addPlayer() {
     players.push(new Player(name));
     nameInput.value = '';
     updateScoreboard();
-    addToHistory(`Player ${name} joined the tournament`);
+    addToHistory(`Player ${escapeHtml(name)} joined the tournament`);
 }
 
 // Start new game
@@ -582,7 +589,7 @@ function recordScore() {
         // Check for bust (score below 0 or exactly 1 for standard games)
         if (currentPlayer.currentScore < 0 || (currentPlayer.currentScore === 1 && currentGame.type !== '180')) {
             currentPlayer.currentScore += score; // Reset score
-            addToHistory(`${currentPlayer.name} bust! Score reset.`);
+            addToHistory(`${escapeHtml(currentPlayer.name)} bust! Score reset.`);
         }
 
         // Check for win
@@ -595,7 +602,7 @@ function recordScore() {
                 currentPlayer.bestFinish = score;
             }
 
-            addToHistory(`🎉 ${currentPlayer.name} wins the game with a ${score} finish!`);
+            addToHistory(`🎉 ${escapeHtml(currentPlayer.name)} wins the game with a ${score} finish!`);
             document.getElementById('currentGameTiddler').style.display = 'none';
             updateScoreboard();
             scoreInput.value = '';
@@ -612,7 +619,7 @@ function recordScore() {
     updateScoreboard();
     scoreInput.value = '';
 
-    addToHistory(`${currentPlayer.name} threw ${score}, score now ${currentPlayer.currentScore}`);
+    addToHistory(`${escapeHtml(currentPlayer.name)} threw ${score}, score now ${currentPlayer.currentScore}`);
 }
 
 // Undo last score
@@ -637,7 +644,7 @@ function undoLastScore() {
     updateScoreboard();
     document.getElementById('currentGameTiddler').style.display = 'block';
 
-    addToHistory(`Undid ${player.name}'s throw of ${lastScore.thrownScore}`);
+    addToHistory(`Undid ${escapeHtml(player.name)}'s throw of ${lastScore.thrownScore}`);
 }
 
 // Update current player display
@@ -658,7 +665,7 @@ function removePlayer(index) {
 
     updateScoreboard();
     updateCurrentPlayer();
-    addToHistory(`Player ${player.name} removed from tournament`);
+    addToHistory(`Player ${escapeHtml(player.name)} removed from tournament`);
 }
 
 // Update scoreboard
@@ -682,7 +689,7 @@ function updateScoreboard() {
         const average = player.totalThrows > 0 ? (player.totalScore / player.totalThrows).toFixed(1) : '0.0';
 
         row.innerHTML = `
-            <td><strong>${player.name}</strong></td>
+            <td><strong>${escapeHtml(player.name)}</strong></td>
             <td>${player.currentScore}</td>
             <td>${player.gamesWon}</td>
             <td>${average}</td>
