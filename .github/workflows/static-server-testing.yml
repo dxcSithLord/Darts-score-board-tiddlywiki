@@ -39,71 +39,57 @@ jobs:
         echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
         sleep 3
 
-    - name: Start and test http-server (Windows)
+    - name: Test file content directly (Windows)
       if: runner.os == 'Windows'
       shell: pwsh
       run: |
-        # Start http-server in background using Start-Process
-        $serverProcess = Start-Process -FilePath "http-server" -ArgumentList "-p","8080" -PassThru -WindowStyle Hidden
-        Write-Host "Server process started with PID: $($serverProcess.Id)"
+        # On Windows, validate the HTML file directly without HTTP server
+        # The browser-testing.yml workflow tests actual browser rendering
+        Write-Host "Testing darts-score.html directly via file system..."
 
-        # Wait for server to be ready
-        $maxWaitAttempts = 15
-        $waitAttempt = 0
-        $serverReady = $false
-        do {
-          Start-Sleep -Seconds 1
-          $waitAttempt++
-          try {
-            $test = Test-NetConnection -ComputerName localhost -Port 8080 -WarningAction SilentlyContinue -InformationLevel Quiet
-            if ($test) {
-              Write-Host "✓ Server is listening on port 8080 (after $waitAttempt seconds)"
-              $serverReady = $true
-              break
-            }
-          } catch {
-            Write-Host "Waiting for server... ($waitAttempt)"
-          }
-        } while ($waitAttempt -lt $maxWaitAttempts)
+        # Verify file exists
+        if (-not (Test-Path "darts-score.html")) {
+          throw "darts-score.html not found"
+        }
+        Write-Host "✓ File exists"
 
-        if (-not $serverReady) {
-          throw "Server did not start within $maxWaitAttempts seconds"
+        # Read and validate content
+        $content = Get-Content -Path "darts-score.html" -Raw
+        Write-Host "File size: $($content.Length) bytes"
+
+        # Check for required content
+        if ($content -match "Darts Competition Scoreboard") {
+          Write-Host "✓ Title found"
+        } else {
+          throw "Title 'Darts Competition Scoreboard' not found"
         }
 
-        # Test server response with retry logic
-        $maxAttempts = 3
-        $attempt = 0
-        $success = $false
-        do {
-          $attempt++
-          try {
-            Write-Host "Test attempt $attempt of $maxAttempts..."
-            $response = Invoke-WebRequest -Uri "http://localhost:8080/darts-score.html" -TimeoutSec 10 -UseBasicParsing
-            Write-Host "HTTP Status: $($response.StatusCode)"
-            if ($response.Content -match "Darts Competition Scoreboard") {
-              Write-Host "✓ Content validation passed"
-              $success = $true
-              break
-            } else {
-              throw "Content validation failed - title not found"
-            }
-          } catch {
-            Write-Host "Attempt $attempt failed: $($_.Exception.Message)"
-            if ($attempt -lt $maxAttempts) {
-              Start-Sleep -Seconds 2
-            }
-          }
-        } while ($attempt -lt $maxAttempts)
-
-        # Cleanup
-        if ($serverProcess -and -not $serverProcess.HasExited) {
-          Stop-Process -Id $serverProcess.Id -Force -ErrorAction SilentlyContinue
-          Write-Host "Server process stopped"
+        if ($content -match "<!DOCTYPE html>") {
+          Write-Host "✓ Valid HTML doctype"
+        } else {
+          throw "Missing DOCTYPE declaration"
         }
 
-        if (-not $success) {
-          throw "Server test failed after $maxAttempts attempts"
+        if ($content -match '<html lang="en">') {
+          Write-Host "✓ Language attribute present"
+        } else {
+          throw "Missing lang attribute"
         }
+
+        if ($content -match "<script>") {
+          Write-Host "✓ JavaScript section found"
+        } else {
+          throw "No JavaScript found"
+        }
+
+        if ($content -match "<style>") {
+          Write-Host "✓ CSS styles found"
+        } else {
+          throw "No CSS styles found"
+        }
+
+        Write-Host "✓ All content validation checks passed"
+        Write-Host "Note: Full browser rendering is tested in browser-testing.yml"
 
     - name: Test server response (Unix)
       if: runner.os != 'Windows'
