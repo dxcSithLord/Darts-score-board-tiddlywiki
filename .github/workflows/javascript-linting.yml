@@ -3,8 +3,14 @@ name: JavaScript Linting (Cross-Platform)
 on:
   push:
     branches: ['main', 'claude/**']
+    paths:
+      - 'darts-score.html'
+      - '.github/workflows/javascript-linting.yml'
   pull_request:
     branches: ['main']
+    paths:
+      - 'darts-score.html'
+      - '.github/workflows/javascript-linting.yml'
   workflow_dispatch:
 
 permissions:

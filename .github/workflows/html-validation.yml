@@ -3,8 +3,16 @@ name: HTML Validation (Cross-Platform)
 on:
   push:
     branches: ['main', 'claude/**']
+    paths:
+      - '*.html'
+      - '!docs.html'
+      - '.github/workflows/html-validation.yml'
   pull_request:
     branches: ['main']
+    paths:
+      - '*.html'
+      - '!docs.html'
+      - '.github/workflows/html-validation.yml'
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 0'  # Weekly on Sunday
@@ -37,6 +45,7 @@ jobs:
     - name: Validate HTML files
       shell: bash
       run: |
+        shopt -s nullglob
         # Validate all HTML files except TiddlyWiki-generated docs.html
         # docs.html uses TiddlyWiki's own HTML structure which differs from standard validation
         for file in *.html; do
@@ -55,6 +64,7 @@ jobs:
     - name: Run htmlhint
       shell: bash
       run: |
+        shopt -s nullglob
         # Validate all HTML files except TiddlyWiki-generated docs.html
         for file in *.html; do
           if [ "$file" != "docs.html" ]; then

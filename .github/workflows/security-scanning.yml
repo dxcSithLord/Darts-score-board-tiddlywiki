@@ -3,8 +3,14 @@ name: Security Scanning (Cross-Platform)
 on:
   push:
     branches: ['main', 'claude/**']
+    paths:
+      - 'darts-score.html'
+      - '.github/workflows/security-scanning.yml'
   pull_request:
     branches: ['main']
+    paths:
+      - 'darts-score.html'
+      - '.github/workflows/security-scanning.yml'
   workflow_dispatch:
   schedule:
     - cron: '30 2 * * 1'  # Weekly on Monday at 2:30 AM
