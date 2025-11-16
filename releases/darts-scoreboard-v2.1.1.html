@@ -725,16 +725,31 @@ function updateScoreboard() {
 
         const average = player.totalThrows > 0 ? (player.totalScore / player.totalThrows).toFixed(1) : '0.0';
 
-        row.innerHTML = `
-            <td><strong>${player.name}</strong></td>
-            <td>${player.currentScore}</td>
-            <td>${player.gamesWon}</td>
-            <td>${average}</td>
-            <td>${player.bestFinish || '-'}</td>
-            <td>
-                <button type="button" class="btn btn-small btn-danger" onclick="removePlayer(${index})">Remove</button>
-            </td>
-        `;
+        // Create cells safely using textContent to prevent XSS
+        const nameCell = row.insertCell();
+        const nameStrong = document.createElement('strong');
+        nameStrong.textContent = player.name;
+        nameCell.appendChild(nameStrong);
+
+        const scoreCell = row.insertCell();
+        scoreCell.textContent = player.currentScore;
+
+        const winsCell = row.insertCell();
+        winsCell.textContent = player.gamesWon;
+
+        const avgCell = row.insertCell();
+        avgCell.textContent = average;
+
+        const bestCell = row.insertCell();
+        bestCell.textContent = player.bestFinish || '-';
+
+        const actionCell = row.insertCell();
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn btn-small btn-danger';
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', () => removePlayer(index));
+        actionCell.appendChild(removeBtn);
     });
 }
 
@@ -749,7 +764,15 @@ function addToHistory(message) {
     }
 
     const historyDiv = document.getElementById('matchHistory');
-    historyDiv.innerHTML = gameHistory.map(entry => `<p>${entry}</p>`).join('');
+    // Clear existing content safely
+    historyDiv.innerHTML = '';
+
+    // Create elements safely using textContent to prevent XSS
+    gameHistory.forEach(entry => {
+        const p = document.createElement('p');
+        p.textContent = entry;
+        historyDiv.appendChild(p);
+    });
 }
 
 // Reset tournament
