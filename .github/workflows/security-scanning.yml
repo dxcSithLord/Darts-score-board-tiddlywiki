@@ -1,0 +1,49 @@
+name: Security Scanning (Cross-Platform)
+
+on:
+  push:
+    branches: ['main', 'claude/**']
+  pull_request:
+    branches: ['main']
+  workflow_dispatch:
+  schedule:
+    - cron: '30 2 * * 1'  # Weekly on Monday at 2:30 AM
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  security-scan:
+    name: Security Scan on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-latest, windows-latest]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Run Microsoft Security DevOps
+      uses: microsoft/security-devops-action@v1
+      id: msdo
+      continue-on-error: true
+      timeout-minutes: 10
+
+    - name: Upload results to Security tab
+      uses: github/codeql-action/upload-sarif@v3
+      if: always() && steps.msdo.outputs.sarifFile != ''
+      with:
+        sarif_file: ${{ steps.msdo.outputs.sarifFile }}
+      continue-on-error: true
+
+    - name: Upload results as artifact
+      uses: actions/upload-artifact@v4
+      if: always() && steps.msdo.outputs.sarifFile != ''
+      with:
+        name: security-results-${{ matrix.os }}
+        path: ${{ steps.msdo.outputs.sarifFile }}
+      continue-on-error: true

@@ -1,0 +1,119 @@
+name: Browser Testing (Cross-Platform)
+
+on:
+  push:
+    branches: ['main', 'claude/**']
+  pull_request:
+    branches: ['main']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-test:
+    name: Test on ${{ matrix.browser }} - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-latest, windows-latest]
+        browser: [chromium, firefox, webkit]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Playwright
+      run: |
+        npm install -D @playwright/test
+        npx playwright install --with-deps ${{ matrix.browser }}
+      timeout-minutes: 10
+      continue-on-error: ${{ matrix.browser == 'webkit' }}
+
+    - name: Install Playwright dependencies (fallback)
+      if: failure()
+      run: |
+        npx playwright install-deps ${{ matrix.browser }}
+        npx playwright install ${{ matrix.browser }}
+      timeout-minutes: 5
+
+    - name: Create Playwright test
+      shell: bash
+      run: |
+        cat > playwright-test.js << 'EOF'
+        const { test, expect } = require('@playwright/test');
+        const fs = require('fs');
+        const path = require('path');
+
+        test('Darts Scoreboard loads and basic functionality', async ({ page }) => {
+          const htmlPath = path.join(__dirname, 'darts-score.html');
+          const htmlContent = fs.readFileSync(htmlPath, 'utf8');
+
+          await page.setContent(htmlContent);
+
+          // Wait for page to load
+          await page.waitForLoadState('domcontentloaded');
+
+          // Check title
+          await expect(page).toHaveTitle(/Darts Competition Scoreboard/);
+
+          // Check for main elements
+          const header = page.locator('.tiddlywiki-header');
+          await expect(header).toBeVisible();
+
+          // Check for scoreboard elements
+          const playerInput = page.locator('input[type="text"]').first();
+          await expect(playerInput).toBeVisible();
+
+          console.log('✓ Page loaded successfully');
+          console.log('✓ Header is visible');
+          console.log('✓ Player input is visible');
+        });
+        EOF
+
+    - name: Create Playwright config
+      shell: bash
+      run: |
+        cat > playwright.config.js << 'EOF'
+        module.exports = {
+          testDir: '.',
+          testMatch: 'playwright-test.js',
+          timeout: 30000,
+          use: {
+            headless: true,
+          },
+          projects: [
+            {
+              name: 'chromium',
+              use: { browserName: 'chromium' },
+            },
+            {
+              name: 'firefox',
+              use: { browserName: 'firefox' },
+            },
+            {
+              name: 'webkit',
+              use: { browserName: 'webkit' },
+            },
+          ],
+        };
+        EOF
+
+    - name: Run Playwright tests
+      run: npx playwright test --project=${{ matrix.browser }}
+      timeout-minutes: 5
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-results-${{ matrix.browser }}-${{ matrix.os }}
+        path: |
+          test-results/
+          playwright-report/
