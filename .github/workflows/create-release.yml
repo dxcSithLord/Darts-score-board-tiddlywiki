@@ -55,30 +55,30 @@ jobs:
 
     - name: Create release file with metadata
       run: |
-        # Create the release file with version metadata
-        cat > releases/darts-scoreboard-latest.html << 'HEADER'
-        <!DOCTYPE html>
-        <!--
-          Darts Scoreboard - Standalone Release
-          Version: ${{ steps.version.outputs.version }}
-          Build Date: ${{ steps.date.outputs.date }}
+        # Create the release file with version metadata directly (no sed needed)
+        VERSION="${{ steps.version.outputs.version }}"
+        BUILD_DATE="${{ steps.date.outputs.date }}"
+        REPO="${{ github.repository }}"
 
-          This is a standalone HTML file that can be:
-          - Downloaded and opened locally via file:// URI
-          - Used offline without internet connection
-          - All CSS and JavaScript is embedded inline
+        # Write header with variables already expanded
+        cat > releases/darts-scoreboard-latest.html << EOF
+<!DOCTYPE html>
+<!--
+  Darts Scoreboard - Standalone Release
+  Version: ${VERSION}
+  Build Date: ${BUILD_DATE}
 
-          GitHub: https://github.com/${{ github.repository }}
-        -->
-        HEADER
+  This is a standalone HTML file that can be:
+  - Downloaded and opened locally via file:// URI
+  - Used offline without internet connection
+  - All CSS and JavaScript is embedded inline
+
+  GitHub: https://github.com/${REPO}
+-->
+EOF
 
         # Append the rest of the HTML file (skip DOCTYPE line)
         tail -n +2 darts-score.html >> releases/darts-scoreboard-latest.html
-
-        # Fix the metadata placeholders
-        sed -i "s/\${{ steps.version.outputs.version }}/${{ steps.version.outputs.version }}/g" releases/darts-scoreboard-latest.html
-        sed -i "s/\${{ steps.date.outputs.date }}/${{ steps.date.outputs.date }}/g" releases/darts-scoreboard-latest.html
-        sed -i "s|\${{ github.repository }}|${{ github.repository }}|g" releases/darts-scoreboard-latest.html
 
     - name: Create versioned copy
       run: |
