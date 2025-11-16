@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -163,14 +163,14 @@ body {
     <div class="tiddler-content">
         <div class="player-controls">
             <input type="text" id="playerName" placeholder="Enter player name" maxlength="20">
-            <button class="btn" onclick="addPlayer()">Add Player</button>
+            <button type="button" class="btn" onclick="addPlayer()">Add Player</button>
             <select id="gameType">
                 <option value="501">501 Game</option>
                 <option value="301">301 Game</option>
                 <option value="cricket">Cricket</option>
             </select>
-            <button class="btn" onclick="startNewGame()">Start New Game</button>
-            <button class="btn btn-danger" onclick="resetTournament()">Reset Tournament</button>
+            <button type="button" class="btn" onclick="startNewGame()">Start New Game</button>
+            <button type="button" class="btn btn-danger" onclick="resetTournament()">Reset Tournament</button>
         </div>
     </div>
 </div>
@@ -179,15 +179,15 @@ body {
     <div class="tiddler-title">Current Game</div>
     <div class="tiddler-content">
         <div class="current-game" id="gameInfo">
-            <strong>Game Type:</strong> <span id="currentGameType">501</span> | 
+            <strong>Game Type:</strong> <span id="currentGameType">501</span> |
             <strong>Current Player:</strong> <span id="currentPlayer">-</span>
         </div>
-        
+
         <div class="score-input">
             <label>Score Thrown:</label>
             <input type="number" id="scoreInput" placeholder="0-180" min="0" max="180">
-            <button class="btn" onclick="recordScore()">Record Score</button>
-            <button class="btn btn-small" onclick="undoLastScore()">Undo</button>
+            <button type="button" class="btn" onclick="recordScore()">Record Score</button>
+            <button type="button" class="btn btn-small" onclick="undoLastScore()">Undo</button>
         </div>
     </div>
 </div>
@@ -198,12 +198,12 @@ body {
         <table class="scoreboard" id="scoreboard">
             <thead>
                 <tr>
-                    <th>Player</th>
-                    <th>Current Score</th>
-                    <th>Games Won</th>
-                    <th>Average</th>
-                    <th>Best Finish</th>
-                    <th>Actions</th>
+                    <th scope="col">Player</th>
+                    <th scope="col">Current Score</th>
+                    <th scope="col">Games Won</th>
+                    <th scope="col">Average</th>
+                    <th scope="col">Best Finish</th>
+                    <th scope="col">Actions</th>
                 </tr>
             </thead>
             <tbody id="scoreboardBody">
@@ -247,17 +247,17 @@ function Player(name) {
 function addPlayer() {
     const nameInput = document.getElementById('playerName');
     const name = nameInput.value.trim();
-    
+
     if (!name) {
         alert('Please enter a player name');
         return;
     }
-    
+
     if (players.find(p => p.name === name)) {
         alert('Player already exists');
         return;
     }
-    
+
     players.push(new Player(name));
     nameInput.value = '';
     updateScoreboard();
@@ -270,30 +270,30 @@ function startNewGame() {
         alert('Need at least 2 players to start a game');
         return;
     }
-    
+
     const gameType = document.getElementById('gameType').value;
     const startScore = gameType === '301' ? 301 : 501;
-    
+
     // Reset all players for new game
     players.forEach(player => {
         player.currentScore = gameType === 'cricket' ? 0 : startScore;
         player.active = true;
     });
-    
+
     currentGame = {
         type: gameType,
         startScore: startScore,
         inProgress: true
     };
-    
+
     currentPlayerIndex = 0;
     scoreHistory = [];
-    
+
     document.getElementById('currentGameTiddler').style.display = 'block';
     document.getElementById('currentGameType').textContent = gameType;
     updateCurrentPlayer();
     updateScoreboard();
-    
+
     addToHistory(`New ${gameType} game started with ${players.length} players`);
 }
 
@@ -303,49 +303,49 @@ function recordScore() {
         alert('No game in progress');
         return;
     }
-    
+
     const scoreInput = document.getElementById('scoreInput');
     const score = parseInt(scoreInput.value) || 0;
-    
+
     if (score < 0 || score > 180) {
         alert('Score must be between 0 and 180');
         return;
     }
-    
+
     const currentPlayer = players[currentPlayerIndex];
-    
+
     // Record the throw for undo functionality
     scoreHistory.push({
         playerIndex: currentPlayerIndex,
         oldScore: currentPlayer.currentScore,
         thrownScore: score
     });
-    
+
     // Update player stats
     currentPlayer.totalThrows++;
     currentPlayer.totalScore += score;
-    
+
     if (currentGame.type === 'cricket') {
         currentPlayer.currentScore += score;
     } else {
         currentPlayer.currentScore -= score;
-        
+
         // Check for bust (score below 0 or exactly 1)
         if (currentPlayer.currentScore < 0 || currentPlayer.currentScore === 1) {
             currentPlayer.currentScore += score; // Reset score
             addToHistory(`${currentPlayer.name} bust! Score reset.`);
         }
-        
+
         // Check for win
         if (currentPlayer.currentScore === 0) {
             currentPlayer.gamesWon++;
             currentPlayer.active = false;
             currentGame.inProgress = false;
-            
+
             if (score > currentPlayer.bestFinish) {
                 currentPlayer.bestFinish = score;
             }
-            
+
             addToHistory(`🎉 ${currentPlayer.name} wins the game with a ${score} finish!`);
             document.getElementById('currentGameTiddler').style.display = 'none';
             updateScoreboard();
@@ -353,16 +353,16 @@ function recordScore() {
             return;
         }
     }
-    
+
     // Move to next player
     do {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
     } while (!players[currentPlayerIndex].active);
-    
+
     updateCurrentPlayer();
     updateScoreboard();
     scoreInput.value = '';
-    
+
     addToHistory(`${currentPlayer.name} threw ${score}, score now ${currentPlayer.currentScore}`);
 }
 
@@ -372,22 +372,22 @@ function undoLastScore() {
         alert('No scores to undo');
         return;
     }
-    
+
     const lastScore = scoreHistory.pop();
     const player = players[lastScore.playerIndex];
-    
+
     player.currentScore = lastScore.oldScore;
     player.totalThrows--;
     player.totalScore -= lastScore.thrownScore;
-    
+
     // Move back to previous player
     currentPlayerIndex = lastScore.playerIndex;
     currentGame.inProgress = true;
-    
+
     updateCurrentPlayer();
     updateScoreboard();
     document.getElementById('currentGameTiddler').style.display = 'block';
-    
+
     addToHistory(`Undid ${player.name}'s throw of ${lastScore.thrownScore}`);
 }
 
@@ -402,11 +402,11 @@ function updateCurrentPlayer() {
 function removePlayer(index) {
     const player = players[index];
     players.splice(index, 1);
-    
+
     if (currentPlayerIndex >= players.length) {
         currentPlayerIndex = 0;
     }
-    
+
     updateScoreboard();
     updateCurrentPlayer();
     addToHistory(`Player ${player.name} removed from tournament`);
@@ -415,23 +415,23 @@ function removePlayer(index) {
 // Update scoreboard
 function updateScoreboard() {
     const tbody = document.getElementById('scoreboardBody');
-    
+
     if (players.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6">Add players to start the tournament</td></tr>';
         return;
     }
-    
+
     tbody.innerHTML = '';
-    
+
     players.forEach((player, index) => {
         const row = tbody.insertRow();
-        
+
         if (!player.active && currentGame && currentGame.inProgress) {
             row.classList.add('winner');
         }
-        
+
         const average = player.totalThrows > 0 ? (player.totalScore / player.totalThrows).toFixed(1) : '0.0';
-        
+
         row.innerHTML = `
             <td><strong>${player.name}</strong></td>
             <td>${player.currentScore}</td>
@@ -449,12 +449,12 @@ function updateScoreboard() {
 function addToHistory(message) {
     const timestamp = new Date().toLocaleTimeString();
     gameHistory.unshift(`[${timestamp}] ${message}`);
-    
+
     // Keep only last 50 entries
     if (gameHistory.length > 50) {
         gameHistory = gameHistory.slice(0, 50);
     }
-    
+
     const historyDiv = document.getElementById('matchHistory');
     historyDiv.innerHTML = gameHistory.map(entry => `<p>${entry}</p>`).join('');
 }
@@ -467,10 +467,10 @@ function resetTournament() {
         currentPlayerIndex = 0;
         gameHistory = [];
         scoreHistory = [];
-        
+
         document.getElementById('currentGameTiddler').style.display = 'none';
         updateScoreboard();
-        
+
         document.getElementById('matchHistory').innerHTML = '<p>Match history will appear here...</p>';
         addToHistory('Tournament reset');
     }
