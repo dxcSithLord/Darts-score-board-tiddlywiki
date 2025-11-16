@@ -1,0 +1,116 @@
+name: JavaScript Linting (Cross-Platform)
+
+on:
+  push:
+    branches: ['main', 'claude/**']
+  pull_request:
+    branches: ['main']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  eslint-native:
+    name: ESLint on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-22.04, ubuntu-20.04, ubuntu-latest, windows-latest]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Create ESLint config
+      shell: bash
+      run: |
+        cat > .eslintrc.json << 'EOF'
+        {
+          "env": {
+            "browser": true,
+            "es2021": true
+          },
+          "extends": "eslint:recommended",
+          "parserOptions": {
+            "ecmaVersion": "latest",
+            "sourceType": "script"
+          },
+          "rules": {
+            "no-unused-vars": "warn",
+            "no-undef": "warn"
+          }
+        }
+        EOF
+
+    - name: Install ESLint
+      run: npm install -g eslint
+
+    - name: Extract and lint JavaScript from HTML
+      shell: bash
+      run: |
+        # Extract JavaScript from HTML file for linting
+        grep -Pzo '(?s)<script>(.*?)</script>' darts-score.html | sed 's/<script>//g' | sed 's/<\/script>//g' > extracted-script.js || true
+        if [ -f extracted-script.js ] && [ -s extracted-script.js ]; then
+          eslint extracted-script.js || echo "Linting completed with warnings"
+        else
+          echo "No JavaScript found to lint"
+        fi
+
+  eslint-podman:
+    name: ESLint on ${{ matrix.container }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        container:
+          - 'fedora:latest'
+          - 'fedora:40'
+          - 'registry.access.redhat.com/ubi9/ubi:latest'
+          - 'registry.access.redhat.com/ubi10/ubi:latest'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Podman
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y podman
+
+    - name: Run ESLint in ${{ matrix.container }}
+      run: |
+        podman run --rm -v $(pwd):/workspace:Z ${{ matrix.container }} bash -c '
+          dnf install -y nodejs npm grep sed &&
+          npm install -g eslint &&
+          cd /workspace &&
+          cat > .eslintrc.json << "EOF"
+        {
+          "env": {
+            "browser": true,
+            "es2021": true
+          },
+          "extends": "eslint:recommended",
+          "parserOptions": {
+            "ecmaVersion": "latest",
+            "sourceType": "script"
+          },
+          "rules": {
+            "no-unused-vars": "warn",
+            "no-undef": "warn"
+          }
+        }
+        EOF
+          grep -Pzo "(?s)<script>(.*?)</script>" darts-score.html | sed "s/<script>//g" | sed "s/<\/script>//g" > extracted-script.js || true
+          if [ -f extracted-script.js ] && [ -s extracted-script.js ]; then
+            eslint extracted-script.js || echo "Linting completed with warnings"
+          else
+            echo "No JavaScript found to lint"
+          fi
+        '

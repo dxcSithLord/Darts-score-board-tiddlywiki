@@ -1,0 +1,75 @@
+name: HTML Validation (Cross-Platform)
+
+on:
+  push:
+    branches: ['main', 'claude/**']
+  pull_request:
+    branches: ['main']
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday
+
+permissions:
+  contents: read
+
+jobs:
+  html-validation-native:
+    name: HTML Validation on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-22.04, ubuntu-20.04, ubuntu-latest, windows-latest]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install html-validate
+      run: npm install -g html-validate
+
+    - name: Validate HTML files
+      run: html-validate "*.html"
+
+    - name: Install htmlhint
+      run: npm install -g htmlhint
+
+    - name: Run htmlhint
+      run: htmlhint "*.html"
+
+  html-validation-podman:
+    name: HTML Validation on ${{ matrix.container }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        container:
+          - 'fedora:latest'
+          - 'fedora:40'
+          - 'fedora:39'
+          - 'registry.access.redhat.com/ubi9/ubi:latest'
+          - 'registry.access.redhat.com/ubi10/ubi:latest'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Podman
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y podman
+
+    - name: Validate HTML in ${{ matrix.container }}
+      run: |
+        podman run --rm -v $(pwd):/workspace:Z ${{ matrix.container }} bash -c "
+          dnf install -y nodejs npm &&
+          npm install -g html-validate htmlhint &&
+          cd /workspace &&
+          html-validate '*.html' &&
+          htmlhint '*.html'
+        "

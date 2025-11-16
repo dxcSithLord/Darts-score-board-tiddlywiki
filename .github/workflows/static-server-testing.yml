@@ -1,0 +1,113 @@
+name: Static Server Testing (Cross-Platform)
+
+on:
+  push:
+    branches: ['main', 'claude/**']
+  pull_request:
+    branches: ['main']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  server-test-native:
+    name: Server Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-22.04, ubuntu-20.04, ubuntu-latest, windows-latest]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install http-server
+      run: npm install -g http-server
+
+    - name: Start http-server (Unix)
+      if: runner.os != 'Windows'
+      run: |
+        http-server -p 8080 &
+        SERVER_PID=$!
+        echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
+        sleep 3
+
+    - name: Start http-server (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        Start-Process -NoNewWindow -FilePath "npx" -ArgumentList "http-server","-p","8080"
+        Start-Sleep -Seconds 5
+
+    - name: Test server response (Unix)
+      if: runner.os != 'Windows'
+      run: |
+        curl -f http://localhost:8080/darts-score.html -o /dev/null -s -w "HTTP Status: %{http_code}\n"
+        curl http://localhost:8080/darts-score.html | grep -q "Darts Competition Scoreboard" && echo "✓ Content validation passed"
+
+    - name: Test server response (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $response = Invoke-WebRequest -Uri "http://localhost:8080/darts-score.html"
+        Write-Host "HTTP Status: $($response.StatusCode)"
+        if ($response.Content -match "Darts Competition Scoreboard") {
+          Write-Host "✓ Content validation passed"
+        } else {
+          throw "Content validation failed"
+        }
+
+    - name: Cleanup (Unix)
+      if: always() && runner.os != 'Windows'
+      run: |
+        if [ ! -z "$SERVER_PID" ]; then
+          kill $SERVER_PID || true
+        fi
+
+  server-test-podman:
+    name: Server Test on ${{ matrix.container }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        container:
+          - name: 'fedora-latest'
+            image: 'fedora:latest'
+          - name: 'fedora-40'
+            image: 'fedora:40'
+          - name: 'fedora-39'
+            image: 'fedora:39'
+          - name: 'ubi9'
+            image: 'registry.access.redhat.com/ubi9/ubi:latest'
+          - name: 'ubi10'
+            image: 'registry.access.redhat.com/ubi10/ubi:latest'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Podman
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y podman
+
+    - name: Test http-server in ${{ matrix.container.name }}
+      run: |
+        podman run --rm -v $(pwd):/workspace:Z -p 8080:8080 ${{ matrix.container.image }} bash -c '
+          dnf install -y nodejs npm curl &&
+          npm install -g http-server &&
+          cd /workspace &&
+          timeout 10s http-server -p 8080 &
+          SERVER_PID=$!
+          sleep 3
+          curl -f http://localhost:8080/darts-score.html -o /dev/null -s -w "HTTP Status: %{http_code}\n"
+          curl http://localhost:8080/darts-score.html | grep -q "Darts Competition Scoreboard" && echo "✓ Content validation passed on ${{ matrix.container.name }}"
+          kill $SERVER_PID || true
+        '

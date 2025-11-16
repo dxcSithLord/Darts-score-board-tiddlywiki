@@ -1,0 +1,84 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Pre-deployment Validation
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install validation tools
+      run: npm install -g html-validate htmlhint
+
+    - name: Validate HTML
+      run: |
+        html-validate "*.html"
+        htmlhint "*.html"
+
+    - name: Install Podman
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y podman
+
+    - name: Validate on Fedora (Podman)
+      run: |
+        podman run --rm -v $(pwd):/workspace:Z fedora:latest bash -c "
+          dnf install -y nodejs npm &&
+          npm install -g html-validate &&
+          cd /workspace &&
+          html-validate '*.html'
+        "
+
+    - name: Validate on UBI10 (Podman)
+      run: |
+        podman run --rm -v $(pwd):/workspace:Z registry.access.redhat.com/ubi10/ubi:latest bash -c "
+          dnf install -y nodejs npm &&
+          npm install -g htmlhint &&
+          cd /workspace &&
+          htmlhint '*.html'
+        "
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: validate
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: '.'
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
