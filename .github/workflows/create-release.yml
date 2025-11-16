@@ -9,11 +9,6 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version number (e.g., 1.0.0)'
-        required: false
-        default: ''
 
 permissions:
   contents: write
@@ -33,9 +28,7 @@ jobs:
     - name: Determine version
       id: version
       run: |
-        if [ -n "${{ github.event.inputs.version }}" ]; then
-          VERSION="${{ github.event.inputs.version }}"
-        elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+        if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
           VERSION="${{ github.ref_name }}"
           VERSION="${VERSION#v}"
         else
