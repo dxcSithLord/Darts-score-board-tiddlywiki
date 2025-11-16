@@ -40,6 +40,7 @@ jobs:
     - name: Validate HTML
       shell: bash
       run: |
+        shopt -s nullglob
         # Validate all HTML files except TiddlyWiki-generated docs.html
         # docs.html uses TiddlyWiki's own HTML structure which differs from standard validation
         for file in *.html; do
