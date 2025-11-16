@@ -39,8 +39,8 @@ type: text/vnd.tiddlywiki
 
 !! Technical Features
 
-* ''WCAG Level A Compliant'' - Accessible to all users
-* ''Valid HTML5'' - Passes validation tests
+* ''Semantic HTML Structure'' - Uses proper HTML5 elements and attributes
+* ''Keyboard Accessible'' - Full keyboard navigation and Enter key shortcuts
 * ''Cross-Browser Support'' - Chrome, Firefox, Safari, Edge
 * ''No External Dependencies'' - All CSS/JS inline
 * ''Portable'' - Copy file anywhere, it just works
