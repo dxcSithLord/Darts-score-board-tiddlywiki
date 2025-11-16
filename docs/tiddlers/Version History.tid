@@ -1,0 +1,62 @@
+created: 20251116000000000
+modified: 20251116000000000
+tags: Documentation
+title: Version History
+type: text/vnd.tiddlywiki
+
+! Release History
+
+!! Version 1.0.0 (November 2025)
+
+Initial public release with full feature set:
+
+!!! Core Features
+* 501, 301, 180, and Cricket game types
+* Multi-player support with dynamic add/remove
+* Real-time scoring with automatic calculations
+* Bust detection and win detection
+* Game history with timestamps
+* Player statistics tracking
+
+!!! User Interface
+* TiddlyWiki-inspired styling
+* DXC Purple theme branding
+* Responsive design for all devices
+* Touch-friendly mobile interface
+* Keyboard shortcut support
+
+!!! Technical Improvements
+* WCAG Level A compliance (accessibility)
+* Valid HTML5 structure
+* Cross-browser compatibility
+* Self-contained single-file application
+* No external dependencies
+
+!!! Infrastructure
+* GitHub Actions for automated testing
+* Cross-platform validation (Windows, Linux)
+* HTML validation pipeline
+* Automated release generation
+* GitHub Pages deployment
+
+!! Planned Features
+
+Future versions may include:
+
+* Additional game types (Around the Clock, etc.)
+* Tournament bracket management
+* Export/import game history
+* Custom themes
+* Sound effects (optional)
+* Print-friendly scoresheets
+
+!! Contributing
+
+The project is open source on GitHub:
+[[GitHub Repository|https://github.com/dxcSithLord/Darts-score-board-tiddlywiki]]
+
+Feel free to:
+* Report issues
+* Suggest features
+* Submit pull requests
+* Fork for your own use

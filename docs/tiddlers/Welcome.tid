@@ -1,0 +1,29 @@
+created: 20251116000000000
+modified: 20251116000000000
+tags: Navigation TableOfContents
+title: Welcome
+type: text/vnd.tiddlywiki
+
+! Darts Scoreboard
+
+A lightweight, browser-based darts competition tracker built with HTML, CSS, and JavaScript. No server required - runs entirely in your browser.
+
+!! Quick Navigation
+
+* [[Quick Start Guide]] - Get started in minutes
+* [[Game Types]] - Learn about 501, 301, 180, and Cricket
+* [[Features]] - Full feature list
+* [[Download for Offline Use]] - Use without internet
+* [[Responsive Design]] - Mobile and tablet support
+* [[Version History]] - Release notes and changes
+
+!! About This Project
+
+This scoreboard is inspired by TiddlyWiki's philosophy of self-contained, portable web applications. It's perfect for:
+
+* Pub leagues and tournaments
+* Casual games with friends
+* Practice sessions
+* Mobile scoring during matches
+
+The entire application runs in a single HTML file with no external dependencies.

@@ -1,0 +1,14 @@
+{
+	"description": "Darts Scoreboard Documentation",
+	"plugins": [
+	],
+	"themes": [
+		"tiddlywiki/vanilla",
+		"tiddlywiki/snowwhite"
+	],
+	"build": {
+		"index": [
+			"--render", "$:/core/save/all", "index.html", "text/plain"
+		]
+	}
+}

@@ -1,0 +1,40 @@
+created: 20251116000000000
+modified: 20251116000000000
+tags: Documentation
+title: Quick Start Guide
+type: text/vnd.tiddlywiki
+
+! Getting Started
+
+Follow these simple steps to start tracking your darts competition:
+
+!! Step-by-Step Instructions
+
+# ''Add Players'': Enter player names in the text field and click "Add Player"
+# ''Start Game'': Select your game type (501/301/180/Cricket) and click "Start New Game"
+# ''Record Scores'': Enter the score thrown and press Enter or click "Record Score"
+# ''Track Progress'': Watch the live scoreboard update with current scores and statistics
+
+!! Automatic Features
+
+The scoreboard automatically handles:
+
+* Turn rotation between players
+* Win detection when a player reaches exactly 0
+* Bust detection (score below 0 or exactly 1 for standard games)
+* Game history with timestamps
+* Player statistics (games won, average score, best finish)
+
+!! Keyboard Shortcuts
+
+* ''Enter'' - Record the current score
+* Standard browser shortcuts for navigation
+
+!! Tips
+
+* Players can be removed by clicking the remove button next to their name
+* Use the "Undo" button to correct scoring mistakes
+* The history log shows all actions with timestamps
+* Statistics are calculated automatically as you play
+
+See [[Game Types]] for specific rules for each game format.

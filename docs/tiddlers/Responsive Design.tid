@@ -1,0 +1,62 @@
+created: 20251116000000000
+modified: 20251116000000000
+tags: Documentation
+title: Responsive Design
+type: text/vnd.tiddlywiki
+
+! Mobile & Tablet Support
+
+The Darts Scoreboard includes comprehensive responsive design for all screen sizes.
+
+!! Mobile Phones (Portrait & Landscape)
+
+* Optimized button sizes and touch targets
+* Stacked form controls for easier input
+* Compressed scoreboard with readable font sizes
+* Full-width buttons for easy tapping
+* Efficient use of screen space
+
+!! Tablets
+
+* Balanced layout for both orientations
+* Appropriately sized text and controls
+* Flexible grid system for the scoreboard
+* Room for multiple players on screen
+* Comfortable viewing distance
+
+!! Desktop
+
+* Full-featured interface
+* Spacious layout
+* All statistics visible
+* Large scoreboard table
+* Keyboard shortcut support
+
+!! Key Responsive Features
+
+* ''Flexible Scoreboard'' - Adapts to screen width automatically
+* ''Touch-Friendly Controls'' - Larger tap targets on mobile
+* ''Readable Text'' - Font sizes adjust for device
+* ''Efficient Space Usage'' - Maximizes content in landscape mode
+* ''Scrollable Areas'' - Handle overflow gracefully
+
+!! Small Screen Landscape Mode
+
+Special optimizations for phones in landscape:
+
+* Compact header to maximize content space
+* Reduced margins and padding
+* Optimized control layout
+* Shorter match history panel
+* Quick access to key functions
+
+!! Testing Your Device
+
+The scoreboard automatically detects your screen size and adjusts accordingly. Try:
+
+# Rotating your device between portrait and landscape
+# Resizing your browser window (desktop)
+# Zooming in/out to test readability
+# Using touch gestures vs mouse clicks
+
+The interface should remain usable and attractive at all sizes.
