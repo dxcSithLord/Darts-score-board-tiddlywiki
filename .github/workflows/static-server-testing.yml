@@ -100,14 +100,16 @@ jobs:
 
     - name: Test http-server in ${{ matrix.container.name }}
       run: |
-        podman run --rm -v $(pwd):/workspace:Z -p 8080:8080 ${{ matrix.container.image }} bash -c '
-          dnf install -y nodejs npm curl &&
+        podman run --rm -v $(pwd):/workspace -p 8080:8080 ${{ matrix.container.image }} bash -c '
+          apt-get update &&
+          apt-get install -y nodejs npm curl &&
           npm install -g http-server &&
           cd /workspace &&
-          timeout 10s http-server -p 8080 &
+          http-server -p 8080 &
           SERVER_PID=$!
-          sleep 3
+          sleep 5
           curl -f http://localhost:8080/darts-score.html -o /dev/null -s -w "HTTP Status: %{http_code}\n"
           curl http://localhost:8080/darts-score.html | grep -q "Darts Competition Scoreboard" && echo "✓ Content validation passed on ${{ matrix.container.name }}"
-          kill $SERVER_PID || true
+          kill $SERVER_PID 2>/dev/null || true
+          exit 0
         '

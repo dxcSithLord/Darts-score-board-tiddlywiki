@@ -43,7 +43,7 @@ jobs:
 
     - name: Validate on Fedora (Podman)
       run: |
-        podman run --rm -v $(pwd):/workspace:Z fedora:latest bash -c "
+        podman run --rm -v $(pwd):/workspace fedora:latest bash -c "
           dnf install -y nodejs npm &&
           npm install -g html-validate &&
           cd /workspace &&
@@ -52,7 +52,7 @@ jobs:
 
     - name: Validate on UBI10 (Podman)
       run: |
-        podman run --rm -v $(pwd):/workspace:Z registry.access.redhat.com/ubi10/ubi:latest bash -c "
+        podman run --rm -v $(pwd):/workspace registry.access.redhat.com/ubi10/ubi:latest bash -c "
           dnf install -y nodejs npm &&
           npm install -g htmlhint &&
           cd /workspace &&

@@ -55,8 +55,8 @@ jobs:
     - name: Extract and lint JavaScript from HTML
       shell: bash
       run: |
-        # Extract JavaScript from HTML file for linting
-        grep -Pzo '(?s)<script>(.*?)</script>' darts-score.html | sed 's/<script>//g' | sed 's/<\/script>//g' > extracted-script.js || true
+        # Extract JavaScript from HTML file for linting using sed (cross-platform compatible)
+        sed -n '/<script>/,/<\/script>/p' darts-score.html | sed '/<script>/d' | sed '/<\/script>/d' > extracted-script.js || true
         if [ -f extracted-script.js ] && [ -s extracted-script.js ]; then
           eslint extracted-script.js || echo "Linting completed with warnings"
         else
@@ -86,8 +86,9 @@ jobs:
 
     - name: Run ESLint in ${{ matrix.container }}
       run: |
-        podman run --rm -v $(pwd):/workspace:Z ${{ matrix.container }} bash -c '
-          dnf install -y nodejs npm grep sed &&
+        podman run --rm -v $(pwd):/workspace ${{ matrix.container }} bash -c '
+          apt-get update &&
+          apt-get install -y nodejs npm sed &&
           npm install -g eslint &&
           cd /workspace &&
           cat > .eslintrc.json << "EOF"
@@ -107,7 +108,7 @@ jobs:
           }
         }
         EOF
-          grep -Pzo "(?s)<script>(.*?)</script>" darts-score.html | sed "s/<script>//g" | sed "s/<\/script>//g" > extracted-script.js || true
+          sed -n "/<script>/,/<\/script>/p" darts-score.html | sed "/<script>/d" | sed "/<\/script>/d" > extracted-script.js || true
           if [ -f extracted-script.js ] && [ -s extracted-script.js ]; then
             eslint extracted-script.js || echo "Linting completed with warnings"
           else
