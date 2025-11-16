@@ -55,27 +55,27 @@ jobs:
 
     - name: Create release file with metadata
       run: |
-        # Create the release file with version metadata directly (no sed needed)
+        # Create the release file with version metadata directly
         VERSION="${{ steps.version.outputs.version }}"
         BUILD_DATE="${{ steps.date.outputs.date }}"
         REPO="${{ github.repository }}"
 
-        # Write header with variables already expanded
-        cat > releases/darts-scoreboard-latest.html << EOF
-<!DOCTYPE html>
-<!--
-  Darts Scoreboard - Standalone Release
-  Version: ${VERSION}
-  Build Date: ${BUILD_DATE}
-
-  This is a standalone HTML file that can be:
-  - Downloaded and opened locally via file:// URI
-  - Used offline without internet connection
-  - All CSS and JavaScript is embedded inline
-
-  GitHub: https://github.com/${REPO}
--->
-EOF
+        # Write header with variables expanded using printf (avoids YAML parsing issues)
+        {
+          echo '<!DOCTYPE html>'
+          echo '<!--'
+          echo "  Darts Scoreboard - Standalone Release"
+          echo "  Version: ${VERSION}"
+          echo "  Build Date: ${BUILD_DATE}"
+          echo ""
+          echo "  This is a standalone HTML file that can be:"
+          echo "  - Downloaded and opened locally via file:// URI"
+          echo "  - Used offline without internet connection"
+          echo "  - All CSS and JavaScript is embedded inline"
+          echo ""
+          echo "  GitHub: https://github.com/${REPO}"
+          echo '-->'
+        } > releases/darts-scoreboard-latest.html
 
         # Append the rest of the HTML file (skip DOCTYPE line)
         tail -n +2 darts-score.html >> releases/darts-scoreboard-latest.html
