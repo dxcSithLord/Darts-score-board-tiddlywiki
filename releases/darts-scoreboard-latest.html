@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<!--
+  Darts Scoreboard - Standalone Release
+  Version: 1.0.0
+  Build Date: 2025-11-16
+
+  This is a standalone HTML file that can be:
+  - Downloaded and opened locally via file:// URI
+  - Used offline without internet connection
+  - All CSS and JavaScript is embedded inline
+
+  GitHub: https://github.com/dxcSithLord/Darts-score-board-tiddlywiki
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Darts Competition Scoreboard</title>
+<style>
+/* TiddlyWiki-inspired styling with DXC Purple Theme */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #662D91;
+    margin: 0;
+    padding: 10px;
+    color: #333;
+    box-sizing: border-box;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.tiddlywiki-header {
+    background: #4A1A5C;
+    color: white;
+    padding: 10px 15px;
+    margin: -10px -10px 20px -10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    border-bottom: 3px solid #662D91;
+}
+
+.tiddlywiki-header h1 {
+    margin: 0 0 5px 0;
+    font-size: 1.5rem;
+}
+
+.tiddlywiki-header p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.tiddler {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.tiddler-title {
+    background: #f8f8f8;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 15px;
+    font-weight: bold;
+    color: #662D91;
+}
+
+.tiddler-content {
+    padding: 15px;
+}
+
+.scoreboard {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    display: block;
+    white-space: nowrap;
+}
+
+.scoreboard thead, .scoreboard tbody {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.scoreboard th, .scoreboard td {
+    border: 1px solid #ddd;
+    padding: 8px 4px;
+    text-align: center;
+    font-size: 14px;
+    word-wrap: break-word;
+}
+
+.scoreboard th:first-child, .scoreboard td:first-child {
+    width: 25%;
+    text-align: left;
+}
+
+.scoreboard th:nth-child(2), .scoreboard td:nth-child(2),
+.scoreboard th:nth-child(3), .scoreboard td:nth-child(3),
+.scoreboard th:nth-child(4), .scoreboard td:nth-child(4),
+.scoreboard th:nth-child(5), .scoreboard td:nth-child(5) {
+    width: 15%;
+}
+
+.scoreboard th:last-child, .scoreboard td:last-child {
+    width: 15%;
+}
+
+.scoreboard th {
+    background: #662D91;
+    color: white;
+    font-weight: bold;
+}
+
+.scoreboard tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+.scoreboard tr:hover {
+    background: #E8E2F0;
+}
+
+.player-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+.player-controls input, .player-controls select {
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    flex: 1;
+    min-width: 120px;
+    font-size: 14px;
+}
+
+.btn {
+    background: #662D91;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn:hover {
+    background: #4A1A5C;
+}
+
+.btn-small {
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+.btn-danger {
+    background: #dc3545;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.score-input {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #E8E2F0;
+    border-radius: 4px;
+}
+
+.score-input input {
+    flex: 1;
+    min-width: 100px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 16px;
+}
+
+.game-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.current-game {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.winner {
+    background: #d4edda !important;
+    color: #155724;
+    font-weight: bold;
+}
+
+.match-history {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+/* Mobile and Tablet Responsive Styles */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 5px;
+        font-size: 14px;
+    }
+
+    .tiddlywiki-header {
+        margin: -5px -5px 15px -5px;
+        padding: 8px 10px;
+    }
+
+    .tiddlywiki-header h1 {
+        font-size: 1.3rem;
+    }
+
+    .tiddlywiki-header p {
+        font-size: 0.8rem;
+    }
+
+    .tiddler {
+        margin-bottom: 15px;
+    }
+
+    .tiddler-title {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+
+    .tiddler-content {
+        padding: 10px;
+    }
+
+    .player-controls {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 8px;
+    }
+
+    .player-controls input, .player-controls select {
+        margin-bottom: 5px;
+        min-width: auto;
+    }
+
+    .score-input {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 8px;
+    }
+
+    .score-input label {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .scoreboard {
+        font-size: 12px;
+        display: table;
+        white-space: normal;
+    }
+
+    .scoreboard th, .scoreboard td {
+        padding: 6px 3px;
+        font-size: 11px;
+    }
+
+    .scoreboard thead, .scoreboard tbody {
+        display: table-header-group;
+    }
+
+    .scoreboard tbody {
+        display: table-row-group;
+    }
+
+    .btn {
+        padding: 10px 15px;
+        font-size: 14px;
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    .btn-small {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .current-game {
+        padding: 8px;
+        font-size: 13px;
+    }
+
+    .match-history {
+        max-height: 150px;
+        font-size: 12px;
+        padding: 8px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .scoreboard th, .scoreboard td {
+        padding: 4px 2px;
+        font-size: 10px;
+    }
+
+    .scoreboard th:first-child, .scoreboard td:first-child {
+        width: 30%;
+    }
+
+    .scoreboard th:nth-child(2), .scoreboard td:nth-child(2),
+    .scoreboard th:nth-child(3), .scoreboard td:nth-child(3) {
+        width: 20%;
+    }
+
+    .scoreboard th:nth-child(4), .scoreboard td:nth-child(4),
+    .scoreboard th:nth-child(5), .scoreboard td:nth-child(5) {
+        width: 15%;
+    }
+
+    .scoreboard th:last-child, .scoreboard td:last-child {
+        width: 15%;
+    }
+
+    .btn-small {
+        font-size: 10px;
+        padding: 6px 8px;
+    }
+}
+
+/* Landscape orientation adjustments */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .tiddlywiki-header h1 {
+        font-size: 1.2rem;
+    }
+
+    .tiddlywiki-header p {
+        display: none;
+    }
+
+    .tiddler {
+        margin-bottom: 10px;
+    }
+
+    .match-history {
+        max-height: 120px;
+    }
+
+    .player-controls {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .score-input {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        width: auto;
+        margin-bottom: 0;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="tiddlywiki-header">
+    <h1>🎯 Darts Competition Scoreboard</h1>
+    <p>Professional darts tournament management system</p>
+</div>
+
+<div class="tiddler">
+    <div class="tiddler-title">Tournament Setup</div>
+    <div class="tiddler-content">
+        <div class="player-controls">
+            <input type="text" id="playerName" placeholder="Enter player name" maxlength="20">
+            <button type="button" class="btn" onclick="addPlayer()">Add Player</button>
+            <select id="gameType">
+                <option value="501">501 Game</option>
+                <option value="301">301 Game</option>
+                <option value="180">180 Game</option>
+                <option value="cricket">Cricket</option>
+            </select>
+            <button type="button" class="btn" onclick="startNewGame()">Start New Game</button>
+            <button type="button" class="btn btn-danger" onclick="resetTournament()">Reset Tournament</button>
+        </div>
+    </div>
+</div>
+
+<div class="tiddler" id="currentGameTiddler" style="display:none;">
+    <div class="tiddler-title">Current Game</div>
+    <div class="tiddler-content">
+        <div class="current-game" id="gameInfo">
+            <strong>Game Type:</strong> <span id="currentGameType">501</span> |
+            <strong>Current Player:</strong> <span id="currentPlayer">-</span>
+        </div>
+
+        <div class="score-input">
+            <label>Score Thrown:</label>
+            <input type="number" id="scoreInput" placeholder="0-180" min="0" max="180">
+            <button type="button" class="btn" onclick="recordScore()">Record Score</button>
+            <button type="button" class="btn btn-small" onclick="undoLastScore()">Undo</button>
+        </div>
+    </div>
+</div>
+
+<div class="tiddler">
+    <div class="tiddler-title">Live Scoreboard</div>
+    <div class="tiddler-content">
+        <table class="scoreboard" id="scoreboard">
+            <thead>
+                <tr>
+                    <th scope="col">Player</th>
+                    <th scope="col">Current Score</th>
+                    <th scope="col">Games Won</th>
+                    <th scope="col">Average</th>
+                    <th scope="col">Best Finish</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="scoreboardBody">
+                <tr>
+                    <td colspan="6">Add players to start the tournament</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="tiddler">
+    <div class="tiddler-title">Match History</div>
+    <div class="tiddler-content">
+        <div class="match-history" id="matchHistory">
+            <p>Match history will appear here...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Tournament data
+let players = [];
+let currentGame = null;
+let currentPlayerIndex = 0;
+let gameHistory = [];
+let scoreHistory = [];
+
+// Player constructor
+function Player(name) {
+    this.name = name;
+    this.currentScore = 501;
+    this.gamesWon = 0;
+    this.totalThrows = 0;
+    this.totalScore = 0;
+    this.bestFinish = 0;
+    this.active = true;
+}
+
+// Add player function
+function addPlayer() {
+    const nameInput = document.getElementById('playerName');
+    const name = nameInput.value.trim();
+
+    if (!name) {
+        alert('Please enter a player name');
+        return;
+    }
+
+    if (players.find(p => p.name === name)) {
+        alert('Player already exists');
+        return;
+    }
+
+    players.push(new Player(name));
+    nameInput.value = '';
+    updateScoreboard();
+    addToHistory(`Player ${name} joined the tournament`);
+}
+
+// Start new game
+function startNewGame() {
+    if (players.length < 2) {
+        alert('Need at least 2 players to start a game');
+        return;
+    }
+
+    const gameType = document.getElementById('gameType').value;
+    let startScore;
+
+    switch(gameType) {
+        case '301':
+            startScore = 301;
+            break;
+        case '180':
+            startScore = 180;
+            break;
+        case 'cricket':
+            startScore = 0;
+            break;
+        default:
+            startScore = 501;
+    }
+
+    // Reset all players for new game
+    players.forEach(player => {
+        player.currentScore = startScore;
+        player.active = true;
+    });
+
+    currentGame = {
+        type: gameType,
+        startScore: startScore,
+        inProgress: true
+    };
+
+    currentPlayerIndex = 0;
+    scoreHistory = [];
+
+    document.getElementById('currentGameTiddler').style.display = 'block';
+    document.getElementById('currentGameType').textContent = gameType;
+    updateCurrentPlayer();
+    updateScoreboard();
+
+    addToHistory(`New ${gameType} game started with ${players.length} players`);
+}
+
+// Record score
+function recordScore() {
+    if (!currentGame || !currentGame.inProgress) {
+        alert('No game in progress');
+        return;
+    }
+
+    const scoreInput = document.getElementById('scoreInput');
+    const score = parseInt(scoreInput.value) || 0;
+
+    if (score < 0 || score > 180) {
+        alert('Score must be between 0 and 180');
+        return;
+    }
+
+    const currentPlayer = players[currentPlayerIndex];
+
+    // Record the throw for undo functionality
+    scoreHistory.push({
+        playerIndex: currentPlayerIndex,
+        oldScore: currentPlayer.currentScore,
+        thrownScore: score
+    });
+
+    // Update player stats
+    currentPlayer.totalThrows++;
+    currentPlayer.totalScore += score;
+
+    if (currentGame.type === 'cricket') {
+        currentPlayer.currentScore += score;
+    } else {
+        currentPlayer.currentScore -= score;
+
+        // Check for bust (score below 0 or exactly 1 for standard games)
+        if (currentPlayer.currentScore < 0 || (currentPlayer.currentScore === 1 && currentGame.type !== '180')) {
+            currentPlayer.currentScore += score; // Reset score
+            addToHistory(`${currentPlayer.name} bust! Score reset.`);
+        }
+
+        // Check for win
+        if (currentPlayer.currentScore === 0) {
+            currentPlayer.gamesWon++;
+            currentPlayer.active = false;
+            currentGame.inProgress = false;
+
+            if (score > currentPlayer.bestFinish) {
+                currentPlayer.bestFinish = score;
+            }
+
+            addToHistory(`🎉 ${currentPlayer.name} wins the game with a ${score} finish!`);
+            document.getElementById('currentGameTiddler').style.display = 'none';
+            updateScoreboard();
+            scoreInput.value = '';
+            return;
+        }
+    }
+
+    // Move to next player
+    do {
+        currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+    } while (!players[currentPlayerIndex].active);
+
+    updateCurrentPlayer();
+    updateScoreboard();
+    scoreInput.value = '';
+
+    addToHistory(`${currentPlayer.name} threw ${score}, score now ${currentPlayer.currentScore}`);
+}
+
+// Undo last score
+function undoLastScore() {
+    if (scoreHistory.length === 0) {
+        alert('No scores to undo');
+        return;
+    }
+
+    const lastScore = scoreHistory.pop();
+    const player = players[lastScore.playerIndex];
+
+    player.currentScore = lastScore.oldScore;
+    player.totalThrows--;
+    player.totalScore -= lastScore.thrownScore;
+
+    // Move back to previous player
+    currentPlayerIndex = lastScore.playerIndex;
+    currentGame.inProgress = true;
+
+    updateCurrentPlayer();
+    updateScoreboard();
+    document.getElementById('currentGameTiddler').style.display = 'block';
+
+    addToHistory(`Undid ${player.name}'s throw of ${lastScore.thrownScore}`);
+}
+
+// Update current player display
+function updateCurrentPlayer() {
+    if (currentGame && currentGame.inProgress) {
+        document.getElementById('currentPlayer').textContent = players[currentPlayerIndex].name;
+    }
+}
+
+// Remove player
+function removePlayer(index) {
+    const player = players[index];
+    players.splice(index, 1);
+
+    if (currentPlayerIndex >= players.length) {
+        currentPlayerIndex = 0;
+    }
+
+    updateScoreboard();
+    updateCurrentPlayer();
+    addToHistory(`Player ${player.name} removed from tournament`);
+}
+
+// Update scoreboard
+function updateScoreboard() {
+    const tbody = document.getElementById('scoreboardBody');
+
+    if (players.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6">Add players to start the tournament</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = '';
+
+    players.forEach((player, index) => {
+        const row = tbody.insertRow();
+
+        if (!player.active && currentGame && currentGame.inProgress) {
+            row.classList.add('winner');
+        }
+
+        const average = player.totalThrows > 0 ? (player.totalScore / player.totalThrows).toFixed(1) : '0.0';
+
+        row.innerHTML = `
+            <td><strong>${player.name}</strong></td>
+            <td>${player.currentScore}</td>
+            <td>${player.gamesWon}</td>
+            <td>${average}</td>
+            <td>${player.bestFinish || '-'}</td>
+            <td>
+                <button type="button" class="btn btn-small btn-danger" onclick="removePlayer(${index})">Remove</button>
+            </td>
+        `;
+    });
+}
+
+// Add to match history
+function addToHistory(message) {
+    const timestamp = new Date().toLocaleTimeString();
+    gameHistory.unshift(`[${timestamp}] ${message}`);
+
+    // Keep only last 50 entries
+    if (gameHistory.length > 50) {
+        gameHistory = gameHistory.slice(0, 50);
+    }
+
+    const historyDiv = document.getElementById('matchHistory');
+    historyDiv.innerHTML = gameHistory.map(entry => `<p>${entry}</p>`).join('');
+}
+
+// Reset tournament
+function resetTournament() {
+    if (confirm('Are you sure you want to reset the entire tournament?')) {
+        players = [];
+        currentGame = null;
+        currentPlayerIndex = 0;
+        gameHistory = [];
+        scoreHistory = [];
+
+        document.getElementById('currentGameTiddler').style.display = 'none';
+        updateScoreboard();
+
+        document.getElementById('matchHistory').innerHTML = '<p>Match history will appear here...</p>';
+        addToHistory('Tournament reset');
+    }
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        const scoreInput = document.getElementById('scoreInput');
+        if (document.activeElement === scoreInput) {
+            recordScore();
+        }
+    }
+});
+
+// Initialize
+addToHistory('Darts Competition Scoreboard initialized');
+</script>
+
+</body>
+</html>
