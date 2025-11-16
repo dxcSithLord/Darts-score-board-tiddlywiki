@@ -35,14 +35,35 @@ jobs:
       timeout-minutes: 3
 
     - name: Validate HTML files
-      run: html-validate "*.html"
+      shell: bash
+      run: |
+        # Validate all HTML files except TiddlyWiki-generated docs.html
+        # docs.html uses TiddlyWiki's own HTML structure which differs from standard validation
+        for file in *.html; do
+          if [ "$file" != "docs.html" ]; then
+            echo "Validating: $file"
+            html-validate "$file"
+          else
+            echo "Skipping: $file (TiddlyWiki generated)"
+          fi
+        done
 
     - name: Install htmlhint
       run: npm install -g htmlhint
       timeout-minutes: 3
 
     - name: Run htmlhint
-      run: htmlhint "*.html"
+      shell: bash
+      run: |
+        # Validate all HTML files except TiddlyWiki-generated docs.html
+        for file in *.html; do
+          if [ "$file" != "docs.html" ]; then
+            echo "Validating: $file"
+            htmlhint "$file"
+          else
+            echo "Skipping: $file (TiddlyWiki generated)"
+          fi
+        done
 
   html-validation-podman:
     name: HTML Validation on ${{ matrix.container }}
@@ -76,6 +97,14 @@ jobs:
           npm config set registry https://registry.npmjs.org/ &&
           npm install -g html-validate htmlhint --loglevel=error &&
           cd /workspace &&
-          html-validate '*.html' &&
-          htmlhint '*.html'
+          # Validate all HTML files except TiddlyWiki-generated docs.html
+          for file in *.html; do
+            if [ \"\$file\" != \"docs.html\" ]; then
+              echo \"Validating: \$file\"
+              html-validate \"\$file\"
+              htmlhint \"\$file\"
+            else
+              echo \"Skipping: \$file (TiddlyWiki generated)\"
+            fi
+          done
         "

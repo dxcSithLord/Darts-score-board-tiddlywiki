@@ -1,0 +1,65 @@
+created: 20251116000000000
+modified: 20251116000000000
+tags: Documentation
+title: Download for Offline Use
+type: text/vnd.tiddlywiki
+
+! Offline Installation
+
+The Darts Scoreboard is available as a standalone HTML file that works completely offline.
+
+!! Quick Download
+
+* [[Latest Release|https://dxcsithlord.github.io/Darts-score-board-tiddlywiki/releases/darts-scoreboard-latest.html]] - Download the most recent version
+* [[GitHub Releases|https://github.com/dxcSithLord/Darts-score-board-tiddlywiki/releases]] - Browse all versions
+
+!! Installation Steps
+
+# Download `darts-scoreboard-latest.html` (or a specific version)
+# Save the file to your local machine (Desktop, Documents, etc.)
+# Double-click the file or open it with your browser
+
+That's it! No installation, no setup, no internet required.
+
+!! Using via file:// URI
+
+You can open the file directly in your browser using a file:// URI:
+
+''Windows'':
+```
+file:///C:/Users/YourName/Desktop/darts-scoreboard.html
+```
+
+''macOS'':
+```
+file:///Users/YourName/Desktop/darts-scoreboard.html
+```
+
+''Linux'':
+```
+file:///home/username/Desktop/darts-scoreboard.html
+```
+
+!! Features of Offline Version
+
+* No internet connection required
+* All CSS and JavaScript embedded in single file
+* Works in Chrome, Firefox, Safari, Edge
+* No external dependencies or CDN links
+* Version information included in file header
+* Portable - copy to USB drive, share with friends
+
+!! Important Notes
+
+!!! localStorage Limitations
+Score history may not persist when using file:// URIs in some browsers due to security restrictions. This is a browser security feature, not a bug.
+
+!!! Browser Compatibility
+For best results, use:
+* Google Chrome (recommended)
+* Mozilla Firefox (recommended)
+* Microsoft Edge
+* Safari (may have file:// restrictions)
+
+!!! Updates
+To get the latest features and bug fixes, simply re-download the latest version from the links above. Your old file can be deleted or kept as a backup.

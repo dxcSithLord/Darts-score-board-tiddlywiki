@@ -1,0 +1,70 @@
+name: Build TiddlyWiki Documentation
+
+on:
+  push:
+    branches: ['main']
+    paths:
+      - 'docs/tiddlers/**'
+      - 'docs/tiddlywiki.info'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-docs:
+    name: Build Documentation Wiki
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+
+    - name: Install TiddlyWiki
+      run: npm install -g tiddlywiki@5.3.8
+
+    - name: Verify TiddlyWiki version
+      run: |
+        INSTALLED_VERSION=$(tiddlywiki --version)
+        EXPECTED_VERSION="5.3.8"
+        echo "Installed TiddlyWiki version: $INSTALLED_VERSION"
+        if [ "$INSTALLED_VERSION" != "$EXPECTED_VERSION" ]; then
+          echo "ERROR: Expected version $EXPECTED_VERSION but got $INSTALLED_VERSION"
+          exit 1
+        fi
+        echo "✓ TiddlyWiki version verified: $INSTALLED_VERSION"
+
+    - name: Build documentation wiki
+      run: |
+        cd docs
+        tiddlywiki . --output ./output --build index
+        echo "Build completed. Output files:"
+        ls -la output/
+
+    - name: Move to repository root for GitHub Pages
+      run: |
+        mv docs/output/index.html docs.html
+        echo "Documentation file created at docs.html"
+
+    - name: Validate generated HTML
+      run: |
+        npm install -g html-validate
+        html-validate docs.html || echo "Note: TiddlyWiki HTML may have some validation warnings"
+      continue-on-error: true
+
+    - name: Commit built documentation
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add docs.html
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Build TiddlyWiki documentation - $(date +'%Y-%m-%d %H:%M')"
+          git push
+        fi

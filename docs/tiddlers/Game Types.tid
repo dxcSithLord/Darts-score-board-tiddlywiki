@@ -1,0 +1,55 @@
+created: 20251116000000000
+modified: 20251116000000000
+tags: Documentation
+title: Game Types
+type: text/vnd.tiddlywiki
+
+! Supported Game Types
+
+The Darts Scoreboard supports four different game formats:
+
+!! 501 Game
+
+The standard darts game format.
+
+* ''Starting Score'': 501
+* ''Objective'': Reduce score to exactly 0
+* ''Bust Rule'': Score below 0 or exactly 1 results in bust (turn reset)
+* ''Best For'': Standard tournament play, longer matches
+
+!! 301 Game
+
+A faster variant of the standard game.
+
+* ''Starting Score'': 301
+* ''Objective'': Reduce score to exactly 0
+* ''Bust Rule'': Score below 0 or exactly 1 results in bust
+* ''Best For'': Quicker games, practice sessions
+
+!! 180 Game
+
+A quick format for fast-paced matches.
+
+* ''Starting Score'': 180
+* ''Objective'': Reduce score to exactly 0
+* ''Special Rule'': Can finish on score of 1 (no bust on 1)
+* ''Best For'': Quick tournament rounds, time-limited play, beginners
+
+This format allows for quicker matches and different strategic approaches compared to 501/301.
+
+!! Cricket
+
+Target-based scoring game.
+
+* ''Starting Score'': 0 (score increases)
+* ''Objective'': Score points by hitting specific targets
+* ''Scoring'': Points add to your total
+* ''Best For'': Strategic play, different darts skills
+
+!! Choosing the Right Game
+
+|!Game Type |!Duration |!Skill Level |!Best Use Case |
+|501 |Long |Advanced |Tournaments, serious play |
+|301 |Medium |Intermediate |Practice, casual tournaments |
+|180 |Short |All levels |Quick games, beginners |
+|Cricket |Variable |All levels |Strategic variety |

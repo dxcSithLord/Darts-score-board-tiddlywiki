@@ -1,0 +1,55 @@
+created: 20251116000000000
+modified: 20251116000000000
+tags: Documentation
+title: Features
+type: text/vnd.tiddlywiki
+
+! Complete Feature List
+
+!! Tournament Management
+
+* ''Dynamic Player Management'' - Add/remove players at any time
+* ''Multiple Game Types'' - Support for 501, 301, 180, and Cricket
+* ''Player Statistics'' - Track games won, average score, best finish
+* ''Game History'' - Complete log with timestamps
+
+!! Live Scoring
+
+* ''Real-time Updates'' - Scoreboard updates instantly
+* ''Current Player Indicator'' - Always know whose turn it is
+* ''Undo Functionality'' - Correct mistakes easily
+* ''Bust Detection'' - Automatic handling for standard games
+* ''Win Detection'' - Celebrates when a player wins
+
+!! User Interface
+
+* ''TiddlyWiki Styling'' - Clean, professional tournament interface
+* ''DXC Purple Theme'' - Consistent branding throughout
+* ''Responsive Design'' - Works on phones, tablets, and desktops
+* ''Touch-Friendly'' - Large tap targets for mobile use
+* ''Keyboard Support'' - Enter key to record scores
+
+!! Advanced Features
+
+* ''Match History Log'' - Track every action with timestamps
+* ''Automatic Statistics'' - Calculated in real-time
+* ''No Server Required'' - Runs entirely in browser
+* ''Self-Contained'' - Single HTML file with all dependencies
+* ''Offline Capable'' - Works without internet connection
+
+!! Technical Features
+
+* ''Semantic HTML Structure'' - Uses proper HTML5 elements and attributes
+* ''Keyboard Accessible'' - Full keyboard navigation and Enter key shortcuts
+* ''Cross-Browser Support'' - Chrome, Firefox, Safari, Edge
+* ''No External Dependencies'' - All CSS/JS inline
+* ''Portable'' - Copy file anywhere, it just works
+
+!! What's NOT Included (by design)
+
+* Cloud sync (keeps it simple and private)
+* User accounts (no login required)
+* Database storage (runs in browser memory)
+* Network features (works offline)
+
+This keeps the application lightweight, fast, and private.
