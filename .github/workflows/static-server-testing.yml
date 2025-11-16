@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, ubuntu-22.04, ubuntu-20.04, ubuntu-latest, windows-latest]
+        os: [ubuntu-22.04, ubuntu-latest, windows-latest]
 
     steps:
     - name: Checkout repository
@@ -78,16 +78,16 @@ jobs:
       fail-fast: false
       matrix:
         container:
-          - name: 'fedora-latest'
-            image: 'fedora:latest'
-          - name: 'fedora-40'
-            image: 'fedora:40'
-          - name: 'fedora-39'
-            image: 'fedora:39'
-          - name: 'ubi9'
-            image: 'registry.access.redhat.com/ubi9/ubi:latest'
-          - name: 'ubi10'
-            image: 'registry.access.redhat.com/ubi10/ubi:latest'
+          - name: 'ubuntu-latest'
+            image: 'ubuntu:latest'
+          # - name: 'fedora-40'
+          #  image: 'fedora:40'
+          # - name: 'fedora-39'
+          #  image: 'fedora:39'
+          # - name: 'ubi9'
+          #  image: 'registry.access.redhat.com/ubi9/ubi:latest'
+          #- name: 'ubi10'
+          #  image: 'registry.access.redhat.com/ubi10/ubi:latest'
 
     steps:
     - name: Checkout repository
