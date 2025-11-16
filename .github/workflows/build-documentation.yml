@@ -26,10 +26,18 @@ jobs:
         node-version: '22'
 
     - name: Install TiddlyWiki
-      run: npm install -g tiddlywiki
+      run: npm install -g tiddlywiki@5.3.8
 
     - name: Verify TiddlyWiki version
-      run: tiddlywiki --version
+      run: |
+        INSTALLED_VERSION=$(tiddlywiki --version)
+        EXPECTED_VERSION="5.3.8"
+        echo "Installed TiddlyWiki version: $INSTALLED_VERSION"
+        if [ "$INSTALLED_VERSION" != "$EXPECTED_VERSION" ]; then
+          echo "ERROR: Expected version $EXPECTED_VERSION but got $INSTALLED_VERSION"
+          exit 1
+        fi
+        echo "✓ TiddlyWiki version verified: $INSTALLED_VERSION"
 
     - name: Build documentation wiki
       run: |
