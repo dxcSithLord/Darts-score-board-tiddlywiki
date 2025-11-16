@@ -33,9 +33,19 @@ jobs:
       timeout-minutes: 3
 
     - name: Validate HTML
+      shell: bash
       run: |
-        html-validate "*.html"
-        htmlhint "*.html"
+        # Validate all HTML files except TiddlyWiki-generated docs.html
+        # docs.html uses TiddlyWiki's own HTML structure which differs from standard validation
+        for file in *.html; do
+          if [ "$file" != "docs.html" ]; then
+            echo "Validating: $file"
+            html-validate "$file"
+            htmlhint "$file"
+          else
+            echo "Skipping: $file (TiddlyWiki generated)"
+          fi
+        done
 
     - name: Install Podman
       run: |
@@ -49,7 +59,15 @@ jobs:
           dnf install -y nodejs npm &&
           npm install -g html-validate --loglevel=error &&
           cd /workspace &&
-          html-validate '*.html'
+          # Validate all HTML files except TiddlyWiki-generated docs.html
+          for file in *.html; do
+            if [ \"\$file\" != \"docs.html\" ]; then
+              echo \"Validating: \$file\"
+              html-validate \"\$file\"
+            else
+              echo \"Skipping: \$file (TiddlyWiki generated)\"
+            fi
+          done
         "
       continue-on-error: true
 
@@ -60,7 +78,15 @@ jobs:
           dnf install -y nodejs npm &&
           npm install -g htmlhint --loglevel=error &&
           cd /workspace &&
-          htmlhint '*.html'
+          # Validate all HTML files except TiddlyWiki-generated docs.html
+          for file in *.html; do
+            if [ \"\$file\" != \"docs.html\" ]; then
+              echo \"Validating: \$file\"
+              htmlhint \"\$file\"
+            else
+              echo \"Skipping: \$file (TiddlyWiki generated)\"
+            fi
+          done
         "
       continue-on-error: true
 
