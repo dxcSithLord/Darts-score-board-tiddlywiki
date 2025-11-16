@@ -21,6 +21,7 @@ jobs:
       with:
         fetch-depth: 0
         token: ${{ secrets.GITHUB_TOKEN }}
+        ref: main
 
     - name: Determine version
       id: version
@@ -99,7 +100,7 @@ jobs:
           echo "No changes to commit"
         else
           git commit -m "Release v${{ steps.version.outputs.version }} - $(date +'%Y-%m-%d')"
-          git push
+          git push origin main
         fi
 
     - name: Create GitHub Release (on tag)
