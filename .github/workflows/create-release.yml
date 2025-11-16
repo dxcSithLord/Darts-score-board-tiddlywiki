@@ -55,30 +55,30 @@ jobs:
 
     - name: Create release file with metadata
       run: |
-        # Create the release file with version metadata
-        cat > releases/darts-scoreboard-latest.html << 'HEADER'
-        <!DOCTYPE html>
-        <!--
-          Darts Scoreboard - Standalone Release
-          Version: ${{ steps.version.outputs.version }}
-          Build Date: ${{ steps.date.outputs.date }}
+        # Create the release file with version metadata directly
+        VERSION="${{ steps.version.outputs.version }}"
+        BUILD_DATE="${{ steps.date.outputs.date }}"
+        REPO="${{ github.repository }}"
 
-          This is a standalone HTML file that can be:
-          - Downloaded and opened locally via file:// URI
-          - Used offline without internet connection
-          - All CSS and JavaScript is embedded inline
-
-          GitHub: https://github.com/${{ github.repository }}
-        -->
-        HEADER
+        # Write header with variables expanded using printf (avoids YAML parsing issues)
+        {
+          echo '<!DOCTYPE html>'
+          echo '<!--'
+          echo "  Darts Scoreboard - Standalone Release"
+          echo "  Version: ${VERSION}"
+          echo "  Build Date: ${BUILD_DATE}"
+          echo ""
+          echo "  This is a standalone HTML file that can be:"
+          echo "  - Downloaded and opened locally via file:// URI"
+          echo "  - Used offline without internet connection"
+          echo "  - All CSS and JavaScript is embedded inline"
+          echo ""
+          echo "  GitHub: https://github.com/${REPO}"
+          echo '-->'
+        } > releases/darts-scoreboard-latest.html
 
         # Append the rest of the HTML file (skip DOCTYPE line)
         tail -n +2 darts-score.html >> releases/darts-scoreboard-latest.html
-
-        # Fix the metadata placeholders
-        sed -i "s/\${{ steps.version.outputs.version }}/${{ steps.version.outputs.version }}/g" releases/darts-scoreboard-latest.html
-        sed -i "s/\${{ steps.date.outputs.date }}/${{ steps.date.outputs.date }}/g" releases/darts-scoreboard-latest.html
-        sed -i "s|\${{ github.repository }}|${{ github.repository }}|g" releases/darts-scoreboard-latest.html
 
     - name: Create versioned copy
       run: |
