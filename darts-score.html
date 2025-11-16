@@ -638,10 +638,42 @@ function updateCurrentPlayer() {
 // Remove player
 function removePlayer(index) {
     const player = players[index];
+
+    // Guard: Prevent removing the currently active player during an ongoing game
+    if (currentGame && currentGame.inProgress && index === currentPlayerIndex) {
+        alert(`Cannot remove ${player.name} - they are the current active player. Please finish the game or pause first.`);
+        return;
+    }
+
     players.splice(index, 1);
 
-    if (currentPlayerIndex >= players.length) {
+    // Adjust currentPlayerIndex after removal
+    if (players.length === 0) {
         currentPlayerIndex = 0;
+    } else if (index < currentPlayerIndex) {
+        // Removed player was before current, shift index down
+        currentPlayerIndex--;
+    } else if (currentPlayerIndex >= players.length) {
+        // Current index is now out of bounds
+        currentPlayerIndex = Math.max(0, players.length - 1);
+    }
+
+    // Ensure currentPlayerIndex points to an active player if game is in progress
+    if (currentGame && currentGame.inProgress && players.length > 0) {
+        // Check if at least one active player remains
+        const hasActivePlayer = players.some(p => p.active);
+        if (!hasActivePlayer) {
+            // No active players remain, end the game
+            currentGame.inProgress = false;
+            addToHistory('Game ended - no active players remaining');
+            document.getElementById('currentGameTiddler').style.display = 'none';
+        } else if (!players[currentPlayerIndex].active) {
+            // Current player is inactive, find next active player
+            const startIndex = currentPlayerIndex;
+            do {
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            } while (!players[currentPlayerIndex].active && currentPlayerIndex !== startIndex);
+        }
     }
 
     updateScoreboard();
