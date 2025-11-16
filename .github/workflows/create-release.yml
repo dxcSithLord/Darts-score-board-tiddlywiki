@@ -3,9 +3,6 @@ name: Create Release
 on:
   push:
     branches: ['main']
-    paths:
-      - 'darts-score.html'
-  push:
     tags:
       - 'v*'
   workflow_dispatch:
