@@ -50,7 +50,8 @@ jobs:
         EOF
 
     - name: Install ESLint
-      run: npm install -g eslint
+      run: npm install -g eslint@8
+      timeout-minutes: 3
 
     - name: Extract and lint JavaScript from HTML
       shell: bash
@@ -85,11 +86,13 @@ jobs:
         sudo apt-get install -y podman
 
     - name: Run ESLint in ${{ matrix.container }}
+      timeout-minutes: 5
       run: |
         podman run --rm -v $(pwd):/workspace ${{ matrix.container }} bash -c '
-          apt-get update &&
-          apt-get install -y nodejs npm sed &&
-          npm install -g eslint &&
+          export DEBIAN_FRONTEND=noninteractive &&
+          apt-get update -qq &&
+          apt-get install -y -qq nodejs npm sed ca-certificates &&
+          npm install -g eslint@8 --loglevel=error &&
           cd /workspace &&
           cat > .eslintrc.json << "EOF"
         {

@@ -99,17 +99,31 @@ jobs:
         sudo apt-get install -y podman
 
     - name: Test http-server in ${{ matrix.container.name }}
+      timeout-minutes: 5
       run: |
-        podman run --rm -v $(pwd):/workspace -p 8080:8080 ${{ matrix.container.image }} bash -c '
-          apt-get update &&
-          apt-get install -y nodejs npm curl &&
-          npm install -g http-server &&
+        podman run --rm -v $(pwd):/workspace --network host ${{ matrix.container.image }} bash -c '
+          export DEBIAN_FRONTEND=noninteractive &&
+          apt-get update -qq &&
+          apt-get install -y -qq nodejs npm curl ca-certificates &&
+          npm install -g http-server --loglevel=error &&
           cd /workspace &&
-          http-server -p 8080 &
+          # Start server bound to 0.0.0.0 for container access
+          http-server -p 8080 -a 0.0.0.0 &
           SERVER_PID=$!
-          sleep 5
-          curl -f http://localhost:8080/darts-score.html -o /dev/null -s -w "HTTP Status: %{http_code}\n"
-          curl http://localhost:8080/darts-score.html | grep -q "Darts Competition Scoreboard" && echo "✓ Content validation passed on ${{ matrix.container.name }}"
+          # Wait longer for npm install + server start
+          sleep 8
+          # Test with retry logic
+          echo "Testing server connectivity..."
+          for i in 1 2 3; do
+            if curl -f http://127.0.0.1:8080/darts-score.html -o /dev/null -s; then
+              echo "✓ Server responding on attempt $i"
+              break
+            fi
+            echo "Attempt $i failed, retrying..."
+            sleep 2
+          done
+          curl -s http://127.0.0.1:8080/darts-score.html -w "\nHTTP Status: %{http_code}\n" | head -5
+          curl -s http://127.0.0.1:8080/darts-score.html | grep -q "Darts Competition Scoreboard" && echo "✓ Content validation passed on ${{ matrix.container.name }}"
           kill $SERVER_PID 2>/dev/null || true
           exit 0
         '

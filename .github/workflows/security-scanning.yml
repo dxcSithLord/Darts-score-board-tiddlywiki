@@ -31,15 +31,19 @@ jobs:
       uses: microsoft/security-devops-action@v1
       id: msdo
       continue-on-error: true
+      timeout-minutes: 10
 
     - name: Upload results to Security tab
       uses: github/codeql-action/upload-sarif@v3
+      if: always() && steps.msdo.outputs.sarifFile != ''
       with:
         sarif_file: ${{ steps.msdo.outputs.sarifFile }}
+      continue-on-error: true
 
     - name: Upload results as artifact
       uses: actions/upload-artifact@v4
-      if: always()
+      if: always() && steps.msdo.outputs.sarifFile != ''
       with:
         name: security-results-${{ matrix.os }}
         path: ${{ steps.msdo.outputs.sarifFile }}
+      continue-on-error: true
