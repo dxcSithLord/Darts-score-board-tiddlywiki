@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Darts Scoreboard - Home</title>
+<style>
+/* TiddlyWiki-inspired styling with DXC Purple Theme */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #662D91;
+    margin: 0;
+    padding: 10px;
+    color: #333;
+    box-sizing: border-box;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.tiddlywiki-header {
+    background: #4A1A5C;
+    color: white;
+    padding: 10px 15px;
+    margin: -10px -10px 20px -10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    border-bottom: 3px solid #662D91;
+}
+
+.tiddlywiki-header h1 {
+    margin: 0 0 5px 0;
+    font-size: 1.5rem;
+}
+
+.tiddlywiki-header p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.tiddler {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tiddler-title {
+    background: #f8f8f8;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 15px;
+    font-weight: bold;
+    color: #662D91;
+    font-size: 1.2rem;
+}
+
+.tiddler-content {
+    padding: 15px;
+    line-height: 1.6;
+}
+
+.nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-list li {
+    margin-bottom: 15px;
+}
+
+.nav-link {
+    display: block;
+    background: #662D91;
+    color: white;
+    padding: 15px 20px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    transition: background-color 0.2s;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+    background: #4A1A5C;
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+
+.nav-link:active {
+    background: #3a1449;
+}
+
+.nav-description {
+    display: block;
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin-top: 5px;
+}
+
+.features {
+    background: #f0f0f0;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-top: 15px;
+}
+
+.features h3 {
+    margin: 0 0 10px 0;
+    color: #662D91;
+    font-size: 1rem;
+}
+
+.features ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.features li {
+    margin-bottom: 5px;
+}
+
+footer {
+    text-align: center;
+    color: white;
+    padding: 20px;
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+footer a {
+    color: white;
+    text-decoration: underline;
+}
+</style>
+</head>
+<body>
+
+<header class="tiddlywiki-header">
+    <h1>Darts Scoreboard</h1>
+    <p>TiddlyWiki-inspired darts competition tracker</p>
+</header>
+
+<main>
+    <div class="tiddler">
+        <div class="tiddler-title">Welcome</div>
+        <div class="tiddler-content">
+            <p>A lightweight, browser-based darts scoreboard application for tracking competition scores. Built with HTML, CSS, and JavaScript - no server required.</p>
+
+            <nav>
+                <ul class="nav-list">
+                    <li>
+                        <a href="darts-score.html" class="nav-link">
+                            Launch Scoreboard
+                            <span class="nav-description">Start tracking your darts competition scores</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="README.md" class="nav-link">
+                            Documentation
+                            <span class="nav-description">View project README and setup instructions</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="features">
+                <h3>Features</h3>
+                <ul>
+                    <li>Multiple game types: 501, 301, 180, and Cricket</li>
+                    <li>Track multiple players simultaneously</li>
+                    <li>Automatic score calculation and bust detection</li>
+                    <li>Game history tracking</li>
+                    <li>Responsive design for mobile and desktop</li>
+                    <li>No installation required - runs entirely in browser</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <p>Darts Scoreboard Project | <a href="https://github.com/dxcSithLord/Darts-score-board-tiddlywiki">View on GitHub</a></p>
+</footer>
+
+</body>
+</html>
