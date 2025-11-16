@@ -39,30 +39,77 @@ jobs:
         echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
         sleep 3
 
-    - name: Start http-server (Windows)
+    - name: Start and test http-server (Windows)
       if: runner.os == 'Windows'
       shell: pwsh
       run: |
-        Start-Process -NoNewWindow -FilePath "npx" -ArgumentList "http-server","-p","8080"
-        Start-Sleep -Seconds 5
+        # Start http-server in background using Start-Process
+        $serverProcess = Start-Process -FilePath "http-server" -ArgumentList "-p","8080" -PassThru -WindowStyle Hidden
+        Write-Host "Server process started with PID: $($serverProcess.Id)"
+
+        # Wait for server to be ready
+        $maxWaitAttempts = 15
+        $waitAttempt = 0
+        $serverReady = $false
+        do {
+          Start-Sleep -Seconds 1
+          $waitAttempt++
+          try {
+            $test = Test-NetConnection -ComputerName localhost -Port 8080 -WarningAction SilentlyContinue -InformationLevel Quiet
+            if ($test) {
+              Write-Host "✓ Server is listening on port 8080 (after $waitAttempt seconds)"
+              $serverReady = $true
+              break
+            }
+          } catch {
+            Write-Host "Waiting for server... ($waitAttempt)"
+          }
+        } while ($waitAttempt -lt $maxWaitAttempts)
+
+        if (-not $serverReady) {
+          throw "Server did not start within $maxWaitAttempts seconds"
+        }
+
+        # Test server response with retry logic
+        $maxAttempts = 3
+        $attempt = 0
+        $success = $false
+        do {
+          $attempt++
+          try {
+            Write-Host "Test attempt $attempt of $maxAttempts..."
+            $response = Invoke-WebRequest -Uri "http://localhost:8080/darts-score.html" -TimeoutSec 10 -UseBasicParsing
+            Write-Host "HTTP Status: $($response.StatusCode)"
+            if ($response.Content -match "Darts Competition Scoreboard") {
+              Write-Host "✓ Content validation passed"
+              $success = $true
+              break
+            } else {
+              throw "Content validation failed - title not found"
+            }
+          } catch {
+            Write-Host "Attempt $attempt failed: $($_.Exception.Message)"
+            if ($attempt -lt $maxAttempts) {
+              Start-Sleep -Seconds 2
+            }
+          }
+        } while ($attempt -lt $maxAttempts)
+
+        # Cleanup
+        if ($serverProcess -and -not $serverProcess.HasExited) {
+          Stop-Process -Id $serverProcess.Id -Force -ErrorAction SilentlyContinue
+          Write-Host "Server process stopped"
+        }
+
+        if (-not $success) {
+          throw "Server test failed after $maxAttempts attempts"
+        }
 
     - name: Test server response (Unix)
       if: runner.os != 'Windows'
       run: |
         curl -f http://localhost:8080/darts-score.html -o /dev/null -s -w "HTTP Status: %{http_code}\n"
         curl http://localhost:8080/darts-score.html | grep -q "Darts Competition Scoreboard" && echo "✓ Content validation passed"
-
-    - name: Test server response (Windows)
-      if: runner.os == 'Windows'
-      shell: pwsh
-      run: |
-        $response = Invoke-WebRequest -Uri "http://localhost:8080/darts-score.html"
-        Write-Host "HTTP Status: $($response.StatusCode)"
-        if ($response.Content -match "Darts Competition Scoreboard") {
-          Write-Host "✓ Content validation passed"
-        } else {
-          throw "Content validation failed"
-        }
 
     - name: Cleanup (Unix)
       if: always() && runner.os != 'Windows'
