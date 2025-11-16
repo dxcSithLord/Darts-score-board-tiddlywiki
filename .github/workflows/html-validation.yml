@@ -3,8 +3,16 @@ name: HTML Validation (Cross-Platform)
 on:
   push:
     branches: ['main', 'claude/**']
+    paths:
+      - '*.html'
+      - '!docs.html'
+      - '.github/workflows/html-validation.yml'
   pull_request:
     branches: ['main']
+    paths:
+      - '*.html'
+      - '!docs.html'
+      - '.github/workflows/html-validation.yml'
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 0'  # Weekly on Sunday
